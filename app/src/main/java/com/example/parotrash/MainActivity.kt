@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,7 +71,7 @@ fun Boton(icon1:ImageVector?,nombre: String, abajo: String?,icon2:Boolean, modif
         //Todo lo que tiene que ver con la estetica
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 5.dp),
+            .padding(5.dp),
         shape = RoundedCornerShape(40.dp),
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedBorderColor = Color(0xFFF9342B),
@@ -143,18 +144,26 @@ fun BotonCargando(nombre: String ){
     var cargando by remember { mutableStateOf(false) }
 
     Button(
-        onClick = { cargando = !cargando },
+        onClick = { cargando = true },
         enabled = !cargando,
         shape = RoundedCornerShape(100.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFF9342B)
+            containerColor = Color(0xFFF9342B),
+            disabledContainerColor = Color(0xFFF9342B)
         ),
         modifier = Modifier
             .padding(5.dp)
-            .fillMaxWidth())
+            .fillMaxWidth()
+            .height(48.dp)
+    )
+
     { if (cargando)
     {
-        CircularProgressIndicator()
+        CircularProgressIndicator(
+            color = Color(0xFFFFFFFF),
+            modifier = Modifier
+                .size(24.dp)
+        )
     } else {
         Text(nombre)
     }
@@ -174,6 +183,6 @@ fun BotonPantalla(){
         verticalArrangement = Arrangement.Center
     ){
         Boton( icon1 = Icons.Default.Email,nombre="Correo",abajo="Olvido su contrase;a", icon2= true)
-
+        BotonCargando("A")
     }
 }
