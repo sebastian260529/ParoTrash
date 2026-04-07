@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.parotrash.ui.pantallas.PantallaInicioSesion
-import com.example.parotrash.ui.pantallas.PantallaRegistrarse
+import androidx.navigation.compose.rememberNavController
+import com.example.parotrash.ui.navegacion.NavegacionApp
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
 class MainActivity : ComponentActivity() {
@@ -13,8 +13,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
             val viewModel = InicioSesionViewModel()
-            PantallaInicioSesion(viewModel)
+
+            NavegacionApp(
+                navController = navController,
+                viewModel = viewModel
+            )
         }
     }
 }
