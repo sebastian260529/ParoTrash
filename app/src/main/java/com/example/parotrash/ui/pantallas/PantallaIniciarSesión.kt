@@ -31,7 +31,11 @@ import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
 
 @Composable
-fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
+fun PantallaInicioSesion(
+    viewModel: InicioSesionViewModel,
+    irARegistro: () -> Unit,
+    irARecuperar: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +84,7 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
             text = "¿Olvidó su contraseña?",
             fontSize = 14.sp,
             color = Color(0xFF03A9F4),
-
+            modifier = Modifier.clickable { irARecuperar() }
         )
 
         // Botón "Iniciar Sesión"
@@ -112,6 +116,7 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
                 text = "Registrarte",
                 fontSize = 14.sp,
                 color = Color(0xFF03A9F4),
+                modifier = Modifier.clickable { irARegistro() }
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -123,5 +128,9 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
 @Composable
 fun PreviewPantallaInicioSesion() {
     val fakeViewModel = InicioSesionViewModel()
-    PantallaInicioSesion(viewModel = fakeViewModel)
+    PantallaInicioSesion(
+        viewModel = fakeViewModel,
+        irARegistro = {},
+        irARecuperar = {}
+    )
 }

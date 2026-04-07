@@ -29,7 +29,10 @@ import com.example.parotrash.ui.componentes.Logo
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
 @Composable
-fun PantallaCodigoSatisfactorio(viewModel: InicioSesionViewModel) {
+fun PantallaCodigoSatisfactorio(
+    viewModel: InicioSesionViewModel,
+    irAInicio: () -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -83,6 +86,7 @@ fun PantallaCodigoSatisfactorio(viewModel: InicioSesionViewModel) {
                 text = "Inicia Sesión",
                 fontSize = 14.sp,
                 color = Color(0xFF03A9F4),
+                modifier = Modifier.clickable { irAInicio() }
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -93,5 +97,8 @@ fun PantallaCodigoSatisfactorio(viewModel: InicioSesionViewModel) {
 @Composable
 fun PreviewPantallaCodigoSatisfactorio() {
     val fakeViewModel = InicioSesionViewModel()
-    PantallaCodigoSatisfactorio(viewModel = fakeViewModel)
+    PantallaCodigoSatisfactorio(
+        viewModel = fakeViewModel,
+        irAInicio = {}
+    )
 }

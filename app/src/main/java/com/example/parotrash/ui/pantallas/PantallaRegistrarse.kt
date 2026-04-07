@@ -34,7 +34,10 @@ import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
 
 @Composable
-fun PantallaRegistrarse(viewModel: InicioSesionViewModel) {
+fun PantallaRegistrarse(
+    viewModel: InicioSesionViewModel,
+    irAInicio: () -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -119,7 +122,7 @@ fun PantallaRegistrarse(viewModel: InicioSesionViewModel) {
                 text = "Inicia Sesión",
                 fontSize = 14.sp,
                 color = Color(0xFF03A9F4),
-                modifier = Modifier.clickable { }
+                modifier = Modifier.clickable { irAInicio() }
             )
         }
 
@@ -131,5 +134,8 @@ fun PantallaRegistrarse(viewModel: InicioSesionViewModel) {
 @Composable
 fun PreviewPantallaRegistrarse() {
     val fakeViewModel = InicioSesionViewModel()
-    PantallaRegistrarse(viewModel = fakeViewModel)
+    PantallaRegistrarse(
+        viewModel = fakeViewModel,
+        irAInicio = {}
+    )
 }
