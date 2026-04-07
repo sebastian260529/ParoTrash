@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.parotrash.ui.pantallas.PantallaInicioSesion
+import com.example.parotrash.ui.pantallas.PantallaRegistrarse
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
 class MainActivity : ComponentActivity() {

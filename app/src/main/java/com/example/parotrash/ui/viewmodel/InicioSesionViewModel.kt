@@ -66,4 +66,28 @@ class InicioSesionViewModel : ViewModel() {
                 }
             }
     }
+    fun recuperarPassword() {
+        if (email.isEmpty()) {
+            mensajeError = "✉️ Ingresa tu correo para enviarte el enlace"
+            return
+        }
+        if (!email.contains("@")) {
+            mensajeError = "✉️ Ingresa un correo válido"
+            return
+        }
+
+        isLoading = true
+        mensajeError = null
+
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                isLoading = false
+                if (task.isSuccessful) {
+                    mensajeError = "✅ Enlace enviado. Revisa tu correo (spam incluido)"
+                } else {
+                    mensajeError = "❌ Error: ${task.exception?.message}"
+                }
+            }
+    }
+
 }

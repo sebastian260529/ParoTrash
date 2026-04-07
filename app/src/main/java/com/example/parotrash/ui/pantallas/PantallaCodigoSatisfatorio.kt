@@ -4,34 +4,33 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
+import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
 @Composable
-fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
+fun PantallaCodigoSatisfactorio(viewModel: InicioSesionViewModel) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,53 +46,25 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
         )
         // Título "Inicio Sesión"
         Text(
-            text = "Inicio Sesión",
+            text = "Código enviado correctamente",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF000000)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Campo Usuario/Email
-        Formulario(
-            icon1 = Icons.Default.Email,
-            nombre = "Correo",
-            abajo = null,
-            icon2 = false,
-            usuario = viewModel.email,
-            onTextChange = { viewModel.updateEmail(it) }
-        )
-        
-        // Campo Contraseña
-        Formulario(
-            icon1 = Icons.Default.Lock,
-            nombre = "Contraseña",
-            abajo = viewModel.mensajeError,
-            icon2 = true,
-            usuario = viewModel.password,
-            onTextChange = { viewModel.updatePassword(it) }
+            color = Color(0xFF000000),
+            textAlign = TextAlign.Center
         )
 
-
-        // "¿Olvido su contraseña?"
         Text(
-            text = "¿Olvidó su contraseña?",
-            fontSize = 14.sp,
-            color = Color(0xFF03A9F4),
-
+            text = "Revisa tu correo electrónico",
+            fontSize = 20.sp,
+            color = Color(0xFF000000),
+            textAlign = TextAlign.Center
         )
 
-        // Botón "Iniciar Sesión"
+
+
         BotonCargando(
-            nombre = "Iniciar Sesión",
+            nombre = "Recuperar Contraseña",
             isLoading = viewModel.isLoading,
-            onClick = { viewModel.login() }
-        )
-
-        // Botón "Continuar Como Invitado"
-        BotonCargando(
-            nombre = "Continuar Como Invitado",
-            isLoading = false,
             onClick = { viewModel.login() }
         )
 
@@ -104,12 +75,12 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "¿No tienes cuenta? ",
+                text = "¿Ya tienes cuenta? ",
                 fontSize = 14.sp,
                 color = Color.Gray
             )
             Text(
-                text = "Registrarte",
+                text = "Inicia Sesión",
                 fontSize = 14.sp,
                 color = Color(0xFF03A9F4),
             )
@@ -117,11 +88,10 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
 // Preview
 @Preview(showBackground = true)
 @Composable
-fun PreviewPantallaInicioSesion() {
+fun PreviewPantallaCodigoSatisfactorio() {
     val fakeViewModel = InicioSesionViewModel()
-    PantallaInicioSesion(viewModel = fakeViewModel)
+    PantallaCodigoSatisfactorio(viewModel = fakeViewModel)
 }

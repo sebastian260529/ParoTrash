@@ -47,75 +47,53 @@ fun Formulario(icon1:ImageVector?,
         Icons.Default.VisibilityOff
     }
 
-    OutlinedTextField(
-        //View Formuulario
-        value= usuario,
-        onValueChange = {onTextChange(it)},
-        //Todo lo que tiene que ver con la estetica
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(5.dp),
-        shape = RoundedCornerShape(40.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = Color(0xFFF9342B),
-            focusedBorderColor = Color(0xFFF9342B)
+    Column (modifier = Modifier
+        .fillMaxWidth(),
+        verticalArrangement = Arrangement.SpaceBetween) {
 
-        ),
-        //funcionalidad
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        singleLine= true,
-        visualTransformation =
-            if (icon2 && !ojo){
-                PasswordVisualTransformation()
-            }else{
-                VisualTransformation.None
+        OutlinedTextField(
+            value = usuario,
+            onValueChange = { onTextChange(it) },
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(40.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color(0xFFF9342B),
+                focusedBorderColor = Color(0xFFF9342B)
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            singleLine = true,
+            visualTransformation =
+                if (icon2 && !ojo) PasswordVisualTransformation()
+                else VisualTransformation.None,
+
+            leadingIcon = {
+                if (icon1 != null) {
+                    Icon(
+                        imageVector = icon1,
+                        contentDescription = null,
+                        tint = Color(0xFFF9342B)
+                    )
+                }
             },
 
+            label = { Text(nombre) },
 
-        //Orden cosas
-        //Icono izquierda
-        leadingIcon = {
-            if (icon1 != null) {
-                Icon(
-                    imageVector = icon1,
-                    contentDescription = null,
-                    tint = Color(0xFFF9342B),
-                    modifier = Modifier.size(24.dp)
-                )
+            trailingIcon = {
+                if (icon2) {
+                    Icon(
+                        imageVector = icono,
+                        contentDescription = null,
+                        tint = Color(0xFFF9342B),
+                        modifier = Modifier.clickable { ojo = !ojo }
+                    )
+                }
             }
-
-        },
-        //texto
-        label = {Text (nombre)},
-        //icono derecha
-
-        trailingIcon ={
-            if (icon2) {
-
-                Icon(
-                    imageVector = icono,
-                    contentDescription = null,
-                    tint = Color(0xFFF9342B),
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable{ojo = !ojo}
-                )
-
-            }
-
-        }
-
-
-    )
-    //texto abajo
-
-    Column(    modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(
-            text = abajo ?: "",
         )
+
+
+        Text( text = abajo ?: "", )
+
     }
 
 }
