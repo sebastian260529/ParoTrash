@@ -34,13 +34,13 @@ fun BotonCargando(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .padding(5.dp)
+            .height(42.dp)
+            .padding(horizontal = 5.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 color = Color.White,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(42.dp)
             )
         } else {
             Text(nombre, color = Color.White)
