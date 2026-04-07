@@ -1,25 +1,39 @@
-package com.example.parotrash.navegacion
+package com.example.parotrash.ui.navegacion
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.example.parotrash.ui.pantallas.PantallaBienvenida
 import com.example.parotrash.ui.pantallas.PantallaCodigoSatisfactorio
 import com.example.parotrash.ui.pantallas.PantallaInicioSesion
+import com.example.parotrash.ui.pantallas.PantallaInicioSesionFallido
 import com.example.parotrash.ui.pantallas.PantallaRecuperarContraseña
 import com.example.parotrash.ui.pantallas.PantallaRegistrarse
+import com.example.parotrash.ui.pantallas.PantallaRegistroExitoso
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
 @Composable
 fun NavegacionApp(
-    viewModel: InicioSesionViewModel,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController,
+    viewModel: InicioSesionViewModel
 ) {
     NavHost(
         navController = navController,
-        startDestination = Pantallas.InicioSesion.ruta
+        startDestination = Pantallas.Bienvenida.ruta
     ) {
+        composable(Pantallas.Bienvenida.ruta) {
+            PantallaBienvenida(
+                irAInicioSesion = {
+                    navController.navigate(Pantallas.InicioSesion.ruta) {
+                        popUpTo(Pantallas.Bienvenida.ruta) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
         composable(Pantallas.InicioSesion.ruta) {
             PantallaInicioSesion(
                 viewModel = viewModel,
@@ -61,8 +75,30 @@ fun NavegacionApp(
                         popUpTo(Pantallas.InicioSesion.ruta) {
                             inclusive = true
                         }
-                        launchSingleTop = true
                     }
+                }
+            )
+        }
+
+        composable(Pantallas.RegistroExitoso.ruta) {
+            PantallaRegistroExitoso(
+                irAInicioSesion = {
+                    navController.navigate(Pantallas.InicioSesion.ruta) {
+                        popUpTo(Pantallas.RegistroExitoso.ruta) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(Pantallas.InicioSesionFallido.ruta) {
+            PantallaInicioSesionFallido(
+                intentarDeNuevo = {
+                    navController.popBackStack()
+                },
+                irARegistro = {
+                    navController.navigate(Pantallas.Registrarse.ruta)
                 }
             )
         }

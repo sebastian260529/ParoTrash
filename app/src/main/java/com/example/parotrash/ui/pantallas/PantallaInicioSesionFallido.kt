@@ -20,16 +20,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parotrash.ui.componentes.BotonCargando
-import com.example.parotrash.ui.componentes.ChulitoOk
 import com.example.parotrash.ui.componentes.Logo
-import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
+import com.example.parotrash.ui.componentes.XError
 
 @Composable
-fun PantallaCodigoSatisfactorio(
-    viewModel: InicioSesionViewModel,
-    irAInicio: () -> Unit
+fun PantallaInicioSesionFallido(
+    intentarDeNuevo: () -> Unit,
+    irARegistro: () -> Unit
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,67 +36,72 @@ fun PantallaCodigoSatisfactorio(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-
+        Spacer(modifier = Modifier.height(40.dp))
 
         Logo(
-            modifier = Modifier.size(160.dp)
+            modifier = Modifier.size(170.dp)
         )
-        // Título "Inicio Sesión"
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        XError(
+            modifier = Modifier.size(110.dp)
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
         Text(
-            text = "Código enviado correctamente",
+            text = "Inicio de sesión fallido",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF000000),
+            color = Color.Black,
             textAlign = TextAlign.Center
         )
 
-        ChulitoOk(
-            modifier = Modifier.size((140.dp))
-        )
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Revisa tu correo electrónico",
-            fontSize = 20.sp,
-            color = Color(0xFF000000),
-            textAlign = TextAlign.Center
+            text = "Ha ocurrido un error al iniciar sesión. Intente de nuevo",
+            fontSize = 14.sp,
+            color = Color.Black,
+            textAlign = TextAlign.Center,
+            lineHeight = 22.sp
         )
 
-
+        Spacer(modifier = Modifier.height(20.dp))
 
         BotonCargando(
-            nombre = "Recuperar Contraseña",
-            isLoading = viewModel.isLoading,
-            onClick = { viewModel.login() }
+            nombre = "Intentar De Nuevo",
+            isLoading = false,
+            onClick = { intentarDeNuevo() }
         )
 
+        Spacer(modifier = Modifier.height(60.dp))
 
-        // Texto "¿No tienes cuenta?" y "Registrarte"
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "¿Ya tienes cuenta? ",
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-            Text(
-                text = "Inicia Sesión",
-                fontSize = 14.sp,
-                color = Color(0xFF03A9F4),
-                modifier = Modifier.clickable { irAInicio() }
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "¿No tienes cuenta?",
+            fontSize = 14.sp,
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Registrate",
+            fontSize = 14.sp,
+            color = Color(0xFF03A9F4),
+            modifier = Modifier.clickable { irARegistro() }
+        )
+
+        Spacer(modifier = Modifier.height(50.dp))
     }
 }
-// Preview
+
 @Preview(showBackground = true)
 @Composable
-fun PreviewPantallaCodigoSatisfactorio() {
-    val fakeViewModel = InicioSesionViewModel()
-    PantallaCodigoSatisfactorio(
-        viewModel = fakeViewModel,
-        irAInicio = {}
+fun PreviewPantallaInicioSesionFallido() {
+    PantallaInicioSesionFallido(
+        intentarDeNuevo = {},
+        irARegistro = {}
     )
 }
