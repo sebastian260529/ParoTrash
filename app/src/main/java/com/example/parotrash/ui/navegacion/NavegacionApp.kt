@@ -66,7 +66,7 @@ fun NavegacionApp(
             PantallaRegistrarse(
                 viewModel = registroViewModel,
                 irAInicio = {
-                    navController.popBackStack()
+                    navController.navigate(Pantallas.InicioSesion.ruta)
                 },
                 irARegistroExitoso = {
                     navController.navigate(Pantallas.RegistroExitoso.ruta) {
