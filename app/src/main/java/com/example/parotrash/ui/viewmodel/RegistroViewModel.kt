@@ -116,23 +116,34 @@ class RegistroViewModel : ViewModel() {
 
         var hayError = false
 
-        if (errorNombre != null) {
+        if (nombre.isEmpty()) {
+            errorNombre = "👤 El nombre no puede estar vacío"
             hayError = true
         }
-        if (errorCorreo != null) {
+        if (correo.isEmpty()) {
+            errorCorreo = "📧 El correo no puede estar vacío"
             hayError = true
         }
-        if (errorContraseña != null) {
+        if (contraseña.isEmpty()) {
+            errorContraseña = "🔒 La contraseña no puede estar vacía"
             hayError = true
         }
-        if (errorConfirmar != null) {
+        if (confirmarContraseña.isEmpty()) {
+            errorConfirmar = "🔒 Confirma tu contraseña"
             hayError = true
         }
 
+        if (errorNombre != null) hayError = true
+        if (errorCorreo != null) hayError = true
+        if (errorContraseña != null) hayError = true
+        if (errorConfirmar != null) hayError = true
+
         if (hayError) {
+            errorGeneral = "❌ Completa todos los campos correctamente"
             return
         }
 
+        // ✅ SOLO SI NO HAY ERRORES
         cargando = true
         errorGeneral = null
 

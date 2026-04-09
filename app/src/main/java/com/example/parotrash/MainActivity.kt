@@ -65,7 +65,7 @@ fun ParotrashApp(sessionManager: SessionManager) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(150.dp)
             )
         }
     } else {

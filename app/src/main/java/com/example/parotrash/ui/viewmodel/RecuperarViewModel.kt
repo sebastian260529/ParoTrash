@@ -36,9 +36,19 @@ class RecuperarViewModel : ViewModel() {
 
 
     fun recuperarContraseña() {
+        if (correo.isEmpty()) {
+            mensaje = "📧 Ingresa tu correo electrónico"
+            return
+        }
+        if (!correo.contains("@")) {
+            mensaje = "✉️ Ingresa un correo válido (ejemplo@correo.com)"
+            return
+        }
 
+        if (mensaje != null) {
+            return
+        }
 
-        // Enviar correo de recuperación
         cargando = true
         mensaje = null
         correoEnviado = false

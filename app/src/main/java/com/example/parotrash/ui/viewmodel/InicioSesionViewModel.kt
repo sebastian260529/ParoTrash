@@ -61,10 +61,33 @@ class InicioSesionViewModel : ViewModel() {
 
 
     fun iniciarSesion() {
+        var hayError = false
 
 
+        when {
+            correo.isEmpty() -> {
+                errorCorreo = "📧 El correo no puede estar vacío"
+                hayError = true
+            }
+            else -> errorCorreo = null
+        }
+
+        when {
+            contraseña.isEmpty() -> {
+                errorContraseña = "🔒 La contraseña no puede estar vacía"
+                hayError = true
+            }
+            else -> errorContraseña = null
+        }
+
+        if (hayError) {
+            errorGeneral = "❌ Completa todos los campos correctamente"
+            return
+        }
         cargando = true
         errorGeneral = null
+
+
 
         FirebaseAuth.getInstance()
             .signInWithEmailAndPassword(correo, contraseña)
