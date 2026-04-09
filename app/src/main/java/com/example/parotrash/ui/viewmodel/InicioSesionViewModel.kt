@@ -3,91 +3,113 @@ package com.example.parotrash.ui.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class InicioSesionViewModel : ViewModel() {
 
-    var email by mutableStateOf("")
-        private set
+    private val _correo = MutableLiveData("")
+    val correo: LiveData<String> = _correo
 
-    var password by mutableStateOf("")
-        private set
+    private val _contraseña = MutableLiveData("")
+    val contraseña: LiveData<String> = _contraseña
 
-    var isLoading by mutableStateOf(false)
-        private set
+    private val _cargando = MutableLiveData(false)
+    val cargando: LiveData<Boolean> = _cargando
 
-    var mensajeError by mutableStateOf<String?>(null)
-        private set
+    private val _errorCorreo = MutableLiveData<String?>()
+    val errorCorreo: LiveData<String?> = _errorCorreo
 
-    fun updateEmail(nuevoEmail: String) {
-        email = nuevoEmail
-        mensajeError = null
+    private val _errorContraseña = MutableLiveData<String?>()
+    val errorContraseña: LiveData<String?> = _errorContraseña
+
+    private val _errorGeneral = MutableLiveData<String?>()
+    val errorGeneral: LiveData<String?> = _errorGeneral
+
+    var loginExitoso by mutableStateOf(false)
+        private set
+    // Actualizar correo
+    fun actualizarCorreo(nuevoCorreo: String) {
+        _correo.value = nuevoCorreo
+        _errorCorreo.value = null
+        _errorGeneral.value = null
     }
 
-    fun updatePassword(nuevaPassword: String) {
-        password = nuevaPassword
-        mensajeError = null
+    fun actualizarContraseña(nuevaContraseña: String) {
+        _contraseña.value = nuevaContraseña
+        _errorContraseña.value = null
+        _errorGeneral.value = null
     }
 
-    fun login() {
+    // Función de inicio de sesión
+    fun iniciarSesion() {
+        val correoValor = _correo.value ?: ""
+        val contraseñaValor = _contraseña.value ?: ""
+
+        var hayError = false
+
         when {
-            email.isEmpty() -> {
-                mensajeError = "El correo no puede estar vacío"
-                return
+            correoValor.isEmpty() -> {
+                _errorCorreo.value = "📧 El correo no puede estar vacío"
+                hayError = true
             }
-            !email.contains("@") -> {
-                mensajeError = "✉Ingresa un correo válido (ejemplo@correo.com)"
-                return
+            !correoValor.contains("@") -> {
+                _errorCorreo.value = "✉️ Ingresa un correo válido (ejemplo@correo.com)"
+                hayError = true
             }
-            password.isEmpty() -> {
-                mensajeError = "La contraseña no puede estar vacía"
-                return
-            }
-            password.length < 6 -> {
-                mensajeError = "La contraseña debe tener al menos 6 caracteres"
-                return
+            else -> {
+                _errorCorreo.value = null
             }
         }
 
-        isLoading = true
-        mensajeError = null
+
+        when {
+            contraseñaValor.isEmpty() -> {
+                _errorContraseña.value = "🔒 La contraseña no puede estar vacía"
+                hayError = true
+            }
+            contraseñaValor.length < 6 -> {
+                _errorContraseña.value = "🔐 La contraseña debe tener al menos 6 caracteres"
+                hayError = true
+            }
+            else -> {
+                _errorContraseña.value = null
+            }
+        }
+
+        if (hayError) {
+            return
+        }
+
+        // Iniciar sesión con Firebase
+        _cargando.value = true
+        _errorGeneral.value = null
 
         FirebaseAuth.getInstance()
-            .signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                isLoading = false
-                if (!task.isSuccessful) {
-                    mensajeError = when {
-                        task.exception?.message?.contains("user-not-found") == true -> "👤 Usuario no encontrado"
-                        task.exception?.message?.contains("wrong-password") == true -> "🔑 Contraseña incorrecta"
-                        else -> "❌ Error al iniciar sesión: ${task.exception?.message}"
+            .signInWithEmailAndPassword(correoValor, contraseñaValor)
+            .addOnCompleteListener { tarea ->
+                _cargando.value = false
+
+                if (tarea.isSuccessful) {
+                    loginExitoso = true
+                    _errorGeneral.value = null
+                } else {
+                    val mensajeError = tarea.exception?.message ?: ""
+                    _errorGeneral.value = when {
+                        mensajeError.contains("user-not-found") -> "👤 Usuario no encontrado"
+                        mensajeError.contains("wrong-password") -> "🔑 Contraseña incorrecta"
+                        mensajeError.contains("network-error") -> "🌐 Revisa tu conexión a internet"
+                        else -> "❌ Error al iniciar sesión. Intenta nuevamente"
                     }
                 }
             }
     }
-    fun recuperarPassword() {
-        if (email.isEmpty()) {
-            mensajeError = "✉️ Ingresa tu correo para enviarte el enlace"
-            return
-        }
-        if (!email.contains("@")) {
-            mensajeError = "✉️ Ingresa un correo válido"
-            return
-        }
 
-        isLoading = true
-        mensajeError = null
-
-        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                isLoading = false
-                if (task.isSuccessful) {
-                    mensajeError = "✅ Enlace enviado. Revisa tu correo (spam incluido)"
-                } else {
-                    mensajeError = "❌ Error: ${task.exception?.message}"
-                }
-            }
+    // Función para invitado
+    fun iniciarComoInvitado() {
+        _errorGeneral.value = null
+        // Aquí va la lógica para invitado
     }
-
 }

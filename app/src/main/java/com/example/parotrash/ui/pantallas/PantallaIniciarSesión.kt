@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -13,15 +12,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +30,25 @@ import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
 
 @Composable
-fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
+fun PantallaInicioSesion(viewModel: InicioSesionViewModel,
+                         irARegistro: () -> Unit,
+                         irARecuperar: () -> Unit,
+                         irAHome: () -> Unit) {
+    // Observar estados
+    val correo by viewModel.correo.observeAsState("")
+    val contrasena by viewModel.contraseña.observeAsState("")
+    val cargando by viewModel.cargando.observeAsState(false)
+    val errorCorreo by viewModel.errorCorreo.observeAsState()
+    val errorContrasena by viewModel.errorContraseña.observeAsState()
+    val errorGeneral by viewModel.errorGeneral.observeAsState()
+    val loginExitoso = viewModel.loginExitoso
+
+    LaunchedEffect(loginExitoso) {
+        if (loginExitoso) {
+            irAHome()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -40,63 +57,70 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
+        Logo(modifier = Modifier.size(160.dp))
 
-
-        Logo(
-            modifier = Modifier.size(160.dp)
-        )
-        // Título "Inicio Sesión"
         Text(
             text = "Inicio Sesión",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF000000)
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo Usuario/Email
+        // Campo Correo con su propio error
         Formulario(
             icon1 = Icons.Default.Email,
             nombre = "Correo",
-            abajo = null,
+            abajo = errorCorreo,
             icon2 = false,
-            usuario = viewModel.email,
-            onTextChange = { viewModel.updateEmail(it) }
+            usuario = correo,
+            onTextChange = { viewModel.actualizarCorreo(it) }
         )
-        
-        // Campo Contraseña
+
+        // Campo Contraseña con su propio error
         Formulario(
             icon1 = Icons.Default.Lock,
             nombre = "Contraseña",
-            abajo = viewModel.mensajeError,
+            abajo = errorContrasena,
             icon2 = true,
-            usuario = viewModel.password,
-            onTextChange = { viewModel.updatePassword(it) }
+            usuario = contrasena,
+            onTextChange = { viewModel.actualizarContraseña(it) }
         )
 
+        // Error general (Firebase)
+        if (errorGeneral != null) {
+            Text(
+                text = errorGeneral ?: "",
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
 
         // "¿Olvido su contraseña?"
         Text(
             text = "¿Olvidó su contraseña?",
             fontSize = 14.sp,
             color = Color(0xFF03A9F4),
-
+            modifier = Modifier.clickable {
+                irARecuperar()
+            }
         )
 
         // Botón "Iniciar Sesión"
         BotonCargando(
             nombre = "Iniciar Sesión",
-            isLoading = viewModel.isLoading,
-            onClick = { viewModel.login() }
+            isLoading = cargando,
+            onClick = { viewModel.iniciarSesion() }
         )
 
         // Botón "Continuar Como Invitado"
         BotonCargando(
             nombre = "Continuar Como Invitado",
             isLoading = false,
-            onClick = { viewModel.login() }
+            onClick = { viewModel.iniciarComoInvitado() }
         )
-
 
         // Texto "¿No tienes cuenta?" y "Registrarte"
         Column(
@@ -106,22 +130,18 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel) {
             Text(
                 text = "¿No tienes cuenta? ",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = Color.Gray,
             )
             Text(
                 text = "Registrarte",
                 fontSize = 14.sp,
                 color = Color(0xFF03A9F4),
+                modifier = Modifier.clickable {
+                    irARegistro()
+                }
             )
         }
+
         Spacer(modifier = Modifier.height(16.dp))
     }
-}
-
-// Preview
-@Preview(showBackground = true)
-@Composable
-fun PreviewPantallaInicioSesion() {
-    val fakeViewModel = InicioSesionViewModel()
-    PantallaInicioSesion(viewModel = fakeViewModel)
 }

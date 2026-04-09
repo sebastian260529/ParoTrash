@@ -1,7 +1,7 @@
 package com.example.parotrash.ui.pantallas
 
+
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,10 +19,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parotrash.ui.componentes.BotonSimple
-import com.example.parotrash.ui.componentes.Check
+import com.example.parotrash.ui.componentes.Logo
 
 @Composable
-fun PantallaCodigoSatisfactorio(
+fun PantallaBienvenida(
     irAInicioSesion: () -> Unit
 ) {
     Column(
@@ -31,39 +31,47 @@ fun PantallaCodigoSatisfactorio(
             .background(Color(0xFFFFFFFF))
             .padding(horizontal = 24.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Componente Check
-        Check(
-            modifier = Modifier.size(80.dp)
+
+        Logo(
+            modifier = Modifier.size(120.dp)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Título
         Text(
-            text = "Código enviado correctamente",
-            fontSize = 24.sp,
+            text = "Bienvenido a ParoTrash",
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF000000),
             textAlign = TextAlign.Center
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "ParoTrash te ayuda a mantenerte informado sobre manifestaciones, bloqueos y afectaciones en la movilidad de la ciudad.",
+            fontSize = 14.sp,
+            color = Color(0xFF666666),
+            textAlign = TextAlign.Center,
+            lineHeight = 20.sp
+        )
+
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Subtítulo
         Text(
-            text = "Revisa tu correo electrónico",
-            fontSize = 16.sp,
+            text = "Consulta alertas en tiempo real, reporta puntos críticos y encuentra rutas alternativas para llegar a tu destino.",
+            fontSize = 14.sp,
             color = Color(0xFF666666),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            lineHeight = 20.sp
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botón "Iniciar Sesión"
         BotonSimple(
-            texto = "Iniciar Sesión",
+            texto = "Comenzar",
             onClick = irAInicioSesion
         )
     }

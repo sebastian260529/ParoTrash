@@ -1,7 +1,6 @@
 package com.example.parotrash.ui.pantallas
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +21,7 @@ import com.example.parotrash.ui.componentes.BotonSimple
 import com.example.parotrash.ui.componentes.Check
 
 @Composable
-fun PantallaCodigoSatisfactorio(
+fun PantallaRegistroExitoso(
     irAInicioSesion: () -> Unit
 ) {
     Column(
@@ -33,29 +32,20 @@ fun PantallaCodigoSatisfactorio(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Componente Check
+        // Componente Check (éxito)
         Check(
-            modifier = Modifier.size(80.dp)
+            modifier = Modifier.size(80.dp),
+
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // Título
         Text(
-            text = "Código enviado correctamente",
+            text = "Registro Exitoso",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF000000),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Subtítulo
-        Text(
-            text = "Revisa tu correo electrónico",
-            fontSize = 16.sp,
-            color = Color(0xFF666666),
             textAlign = TextAlign.Center
         )
 
