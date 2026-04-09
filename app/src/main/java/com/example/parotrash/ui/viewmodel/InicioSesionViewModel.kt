@@ -3,113 +3,125 @@ package com.example.parotrash.ui.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.parotrash.data.SessionManager
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class InicioSesionViewModel : ViewModel() {
 
-    private val _correo = MutableLiveData("")
-    val correo: LiveData<String> = _correo
 
-    private val _contraseña = MutableLiveData("")
-    val contraseña: LiveData<String> = _contraseña
+    var correo by mutableStateOf("")
+        private set
 
-    private val _cargando = MutableLiveData(false)
-    val cargando: LiveData<Boolean> = _cargando
+    var contraseña by mutableStateOf("")
+        private set
 
-    private val _errorCorreo = MutableLiveData<String?>()
-    val errorCorreo: LiveData<String?> = _errorCorreo
 
-    private val _errorContraseña = MutableLiveData<String?>()
-    val errorContraseña: LiveData<String?> = _errorContraseña
+    var cargando by mutableStateOf(false)
+        private set
 
-    private val _errorGeneral = MutableLiveData<String?>()
-    val errorGeneral: LiveData<String?> = _errorGeneral
+    var errorCorreo by mutableStateOf<String?>(null)
+        private set
+
+    var errorContraseña by mutableStateOf<String?>(null)
+        private set
+
+    var errorGeneral by mutableStateOf<String?>(null)
+        private set
+
 
     var loginExitoso by mutableStateOf(false)
-        private set
-    // Actualizar correo
+
     fun actualizarCorreo(nuevoCorreo: String) {
-        _correo.value = nuevoCorreo
-        _errorCorreo.value = null
-        _errorGeneral.value = null
+        correo = nuevoCorreo
+        errorGeneral = null
+
+        // Validación en tiempo real
+        errorCorreo = when {
+            nuevoCorreo.isEmpty() -> "📧 El correo no puede estar vacío"
+            !nuevoCorreo.contains("@") -> "✉️ Ingresa un correo válido (ejemplo@correo.com)"
+            else -> null
+        }
     }
+
 
     fun actualizarContraseña(nuevaContraseña: String) {
-        _contraseña.value = nuevaContraseña
-        _errorContraseña.value = null
-        _errorGeneral.value = null
+        contraseña = nuevaContraseña
+        errorGeneral = null
+
+
+        errorContraseña = when {
+            nuevaContraseña.isEmpty() -> "🔒 La contraseña no puede estar vacía"
+            nuevaContraseña.length < 6 -> "🔐 La contraseña debe tener al menos 8 caracteres"
+            else -> null
+        }
     }
 
-    // Función de inicio de sesión
+
     fun iniciarSesion() {
-        val correoValor = _correo.value ?: ""
-        val contraseñaValor = _contraseña.value ?: ""
-
-        var hayError = false
-
-        when {
-            correoValor.isEmpty() -> {
-                _errorCorreo.value = "📧 El correo no puede estar vacío"
-                hayError = true
-            }
-            !correoValor.contains("@") -> {
-                _errorCorreo.value = "✉️ Ingresa un correo válido (ejemplo@correo.com)"
-                hayError = true
-            }
-            else -> {
-                _errorCorreo.value = null
-            }
-        }
 
 
-        when {
-            contraseñaValor.isEmpty() -> {
-                _errorContraseña.value = "🔒 La contraseña no puede estar vacía"
-                hayError = true
-            }
-            contraseñaValor.length < 6 -> {
-                _errorContraseña.value = "🔐 La contraseña debe tener al menos 6 caracteres"
-                hayError = true
-            }
-            else -> {
-                _errorContraseña.value = null
-            }
-        }
-
-        if (hayError) {
-            return
-        }
-
-        // Iniciar sesión con Firebase
-        _cargando.value = true
-        _errorGeneral.value = null
+        cargando = true
+        errorGeneral = null
 
         FirebaseAuth.getInstance()
-            .signInWithEmailAndPassword(correoValor, contraseñaValor)
+            .signInWithEmailAndPassword(correo, contraseña)
             .addOnCompleteListener { tarea ->
-                _cargando.value = false
+                cargando = false
 
                 if (tarea.isSuccessful) {
                     loginExitoso = true
-                    _errorGeneral.value = null
-                } else {
-                    val mensajeError = tarea.exception?.message ?: ""
-                    _errorGeneral.value = when {
-                        mensajeError.contains("user-not-found") -> "👤 Usuario no encontrado"
-                        mensajeError.contains("wrong-password") -> "🔑 Contraseña incorrecta"
-                        mensajeError.contains("network-error") -> "🌐 Revisa tu conexión a internet"
-                        else -> "❌ Error al iniciar sesión. Intenta nuevamente"
+                    errorGeneral = null
+                }
+                else {
+                    cargando = false
+                    val exception = tarea.exception
+
+                    errorGeneral = when (exception) {
+
+                        is com.google.firebase.auth.FirebaseAuthInvalidCredentialsException -> {
+                            when (exception.errorCode) {
+                                "ERROR_INVALID_EMAIL" -> "✉️ Correo electrónico inválido"
+                                "ERROR_WRONG_PASSWORD" -> "🔑 Contraseña incorrecta"
+                                else -> "❌ Correo o contraseña incorrectos"
+                            }
+                        }
+
+                        is com.google.firebase.auth.FirebaseAuthException -> {
+                            when (exception.errorCode) {
+
+                                "ERROR_TOO_MANY_REQUESTS" ->
+                                    "⏳ Demasiados intentos. Intenta más tarde"
+
+                                "ERROR_OPERATION_NOT_ALLOWED" ->
+                                    "🚫 Inicio de sesión no habilitado"
+
+                                "ERROR_INVALID_CREDENTIAL",
+                                "auth/invalid-credential" ->
+                                    "❌ Credenciales incorrectas"
+
+                                else -> "❌ ${exception.localizedMessage ?: "Error al iniciar sesión"}"
+                            }
+                        }
+
+                        else -> "❌ Error inesperado. Intenta nuevamente"
                     }
                 }
             }
     }
 
-    // Función para invitado
+
     fun iniciarComoInvitado() {
-        _errorGeneral.value = null
-        // Aquí va la lógica para invitado
+        errorGeneral = null
+        loginExitoso = true
+    }
+    fun cerrarSesion(sessionManager: SessionManager, onCerrarSesion: () -> Unit) {
+        viewModelScope.launch {
+            sessionManager.logout()
+            loginExitoso = false
+            onCerrarSesion()
+        }
     }
 }

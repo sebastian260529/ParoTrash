@@ -15,36 +15,38 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
 
 @Composable
-fun PantallaInicioSesion(viewModel: InicioSesionViewModel,
-                         irARegistro: () -> Unit,
-                         irARecuperar: () -> Unit,
-                         irAHome: () -> Unit) {
-    // Observar estados
-    val correo by viewModel.correo.observeAsState("")
-    val contrasena by viewModel.contraseña.observeAsState("")
-    val cargando by viewModel.cargando.observeAsState(false)
-    val errorCorreo by viewModel.errorCorreo.observeAsState()
-    val errorContrasena by viewModel.errorContraseña.observeAsState()
-    val errorGeneral by viewModel.errorGeneral.observeAsState()
+fun PantallaInicioSesion(
+    viewModel: InicioSesionViewModel,
+    irARegistro: () -> Unit,
+    irARecuperar: () -> Unit,
+    irAHome: () -> Unit,
+    sessionManager: SessionManager
+) {
+
+    val correo = viewModel.correo
+    val contrasena = viewModel.contraseña
+    val cargando = viewModel.cargando
+    val errorCorreo = viewModel.errorCorreo
+    val errorContrasena = viewModel.errorContraseña
+    val errorGeneral = viewModel.errorGeneral
     val loginExitoso = viewModel.loginExitoso
 
     LaunchedEffect(loginExitoso) {
         if (loginExitoso) {
+            sessionManager.setLoggedIn(true)
             irAHome()
         }
     }
@@ -68,7 +70,6 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel,
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo Correo con su propio error
         Formulario(
             icon1 = Icons.Default.Email,
             nombre = "Correo",
@@ -78,7 +79,6 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel,
             onTextChange = { viewModel.actualizarCorreo(it) }
         )
 
-        // Campo Contraseña con su propio error
         Formulario(
             icon1 = Icons.Default.Lock,
             nombre = "Contraseña",
@@ -88,7 +88,6 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel,
             onTextChange = { viewModel.actualizarContraseña(it) }
         )
 
-        // Error general (Firebase)
         if (errorGeneral != null) {
             Text(
                 text = errorGeneral ?: "",
@@ -98,7 +97,7 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel,
             )
         }
 
-        // "¿Olvido su contraseña?"
+
         Text(
             text = "¿Olvidó su contraseña?",
             fontSize = 14.sp,
@@ -108,21 +107,17 @@ fun PantallaInicioSesion(viewModel: InicioSesionViewModel,
             }
         )
 
-        // Botón "Iniciar Sesión"
         BotonCargando(
             nombre = "Iniciar Sesión",
             isLoading = cargando,
             onClick = { viewModel.iniciarSesion() }
         )
-
-        // Botón "Continuar Como Invitado"
         BotonCargando(
             nombre = "Continuar Como Invitado",
             isLoading = false,
             onClick = { viewModel.iniciarComoInvitado() }
         )
 
-        // Texto "¿No tienes cuenta?" y "Registrarte"
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

@@ -18,33 +18,25 @@ class RecuperarViewModel : ViewModel() {
     var mensaje by mutableStateOf<String?>(null)
         private set
 
-    // Estado para navegación (AGREGAR)
     var correoEnviado by mutableStateOf(false)
         private set
 
-    // Firebase Auth
+
     private val auth = FirebaseAuth.getInstance()
 
-    // Actualizar correo
     fun actualizarCorreo(nuevoCorreo: String) {
         correo = nuevoCorreo
-        mensaje = null
-        correoEnviado = false  // Resetear al escribir
+        correoEnviado = false
+        mensaje = when {
+            nuevoCorreo.isEmpty() -> "📧 Ingresa tu correo electrónico"
+            !nuevoCorreo.contains("@") -> "✉️ Ingresa un correo válido (ejemplo@correo.com)"
+            else -> null
+        }
     }
 
-    // Función para recuperar contraseña
+
     fun recuperarContraseña() {
-        // Validar correo
-        when {
-            correo.isEmpty() -> {
-                mensaje = "📧 Ingresa tu correo electrónico"
-                return
-            }
-            !correo.contains("@") -> {
-                mensaje = "✉️ Ingresa un correo válido (ejemplo@correo.com)"
-                return
-            }
-        }
+
 
         // Enviar correo de recuperación
         cargando = true
@@ -59,19 +51,34 @@ class RecuperarViewModel : ViewModel() {
                     mensaje = "📧 Se envió un correo a $correo. Revisa tu bandeja de entrada."
                     correoEnviado = true  // ← Activar navegación
                 } else {
-                    val errorReal = tarea.exception?.message ?: "Error desconocido"
-                    mensaje = when {
-                        errorReal.contains("user-not-found") -> "👤 No existe una cuenta con este correo"
-                        errorReal.contains("network") -> "🌐 Revisa tu conexión a internet"
-                        else -> "❌ Error: No se pudo enviar el correo"
+                    val exception = tarea.exception
+
+                    mensaje = when (exception) {
+
+                        is com.google.firebase.auth.FirebaseAuthInvalidCredentialsException -> {
+                            when (exception.errorCode) {
+                                "ERROR_INVALID_EMAIL" -> "✉️ Correo electrónico no encontrado"
+                                else -> "❌ Correo inválido"
+                            }
+                        }
+
+                        is com.google.firebase.auth.FirebaseAuthException -> {
+                            when (exception.errorCode) {
+
+                                "ERROR_MISSING_EMAIL" ->
+                                    "⚠️ Ingresa un correo electrónico"
+
+                                "ERROR_NETWORK_REQUEST_FAILED" ->
+                                    "🌐 Revisa tu conexión a internet"
+
+                                else -> "❌ No se pudo enviar el correo"
+                            }
+                        }
+
+                        else -> "❌ Error inesperado"
                     }
                 }
             }
     }
 
-    // Limpiar mensaje
-    fun limpiarMensaje() {
-        mensaje = null
-        correoEnviado = false
-    }
 }

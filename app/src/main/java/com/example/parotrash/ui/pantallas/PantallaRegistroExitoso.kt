@@ -32,7 +32,7 @@ fun PantallaRegistroExitoso(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Componente Check (éxito)
+
         Check(
             modifier = Modifier.size(80.dp),
 
@@ -51,7 +51,6 @@ fun PantallaRegistroExitoso(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botón "Iniciar Sesión"
         BotonSimple(
             texto = "Iniciar Sesión",
             onClick = irAInicioSesion

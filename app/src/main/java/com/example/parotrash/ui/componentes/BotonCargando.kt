@@ -36,7 +36,7 @@ fun BotonCargando(
         if (isLoading) {
             CircularProgressIndicator(
                 color = Color.White,
-                modifier = Modifier.size(42.dp)
+                modifier = Modifier.size(24.dp)
             )
         } else {
             Text(nombre, color = Color.White)

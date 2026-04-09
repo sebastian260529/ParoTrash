@@ -10,7 +10,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class RegistroViewModel : ViewModel() {
 
-    // Estados para los campos (mutableStateOf)
     var nombre by mutableStateOf("")
         private set
 
@@ -23,11 +22,10 @@ class RegistroViewModel : ViewModel() {
     var confirmarContraseña by mutableStateOf("")
         private set
 
-    // Estado de carga
+
     var cargando by mutableStateOf(false)
         private set
 
-    // Errores por campo (en tiempo real)
     var errorNombre by mutableStateOf<String?>(null)
         private set
 
@@ -43,15 +41,14 @@ class RegistroViewModel : ViewModel() {
     var errorGeneral by mutableStateOf<String?>(null)
         private set
 
-    // Estado para navegación
+
     var registroExitoso by mutableStateOf(false)
         private set
 
-    // Firebase instances
+
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
-    // Actualizar nombre (con validación en tiempo real)
     fun actualizarNombre(nuevoNombre: String) {
         nombre = nuevoNombre
         errorGeneral = null
@@ -64,12 +61,11 @@ class RegistroViewModel : ViewModel() {
         }
     }
 
-    // Actualizar correo (con validación en tiempo real)
+
     fun actualizarCorreo(nuevoCorreo: String) {
         correo = nuevoCorreo
         errorGeneral = null
 
-        // Validación en tiempo real
         errorCorreo = when {
             nuevoCorreo.isEmpty() -> "📧 El correo no puede estar vacío"
             !nuevoCorreo.contains("@") -> "✉️ Ingresa un correo válido (ejemplo@correo.com)"
@@ -77,40 +73,47 @@ class RegistroViewModel : ViewModel() {
         }
     }
 
-    // Actualizar contraseña (con validación en tiempo real)
+
     fun actualizarContraseña(nuevaContraseña: String) {
         contraseña = nuevaContraseña
         errorGeneral = null
 
-        // Validación en tiempo real
+        val tieneMayuscula = nuevaContraseña.any { it.isUpperCase() }
+        val tieneMinuscula = nuevaContraseña.any { it.isLowerCase() }
+        val tieneNumero = nuevaContraseña.any { it.isDigit() }
+        val tieneEspecial = nuevaContraseña.any { !it.isLetterOrDigit() }
+
         errorContraseña = when {
             nuevaContraseña.isEmpty() -> "🔒 La contraseña no puede estar vacía"
-            nuevaContraseña.length < 6 -> "🔐 La contraseña debe tener al menos 6 caracteres"
+
+            nuevaContraseña.length < 8 ||
+                    !tieneMayuscula ||
+                    !tieneMinuscula ||
+                    !tieneNumero ||
+                    !tieneEspecial ->
+                "🔐 La contraseña debe tener mínimo 8 caracteres, incluir mayúscula, número y un carácter especial"
+
             else -> null
         }
 
-        // Re-validar confirmar contraseña si ya tiene valor
         if (confirmarContraseña.isNotEmpty()) {
             actualizarConfirmarContraseña(confirmarContraseña)
         }
     }
 
-    // Actualizar confirmar contraseña (con validación en tiempo real)
+
     fun actualizarConfirmarContraseña(nuevaConfirmar: String) {
         confirmarContraseña = nuevaConfirmar
         errorGeneral = null
 
-        // Validación en tiempo real
         errorConfirmar = when {
             nuevaConfirmar.isEmpty() -> "🔒 Confirma tu contraseña"
             nuevaConfirmar != contraseña -> "⚠️ Las contraseñas no coinciden"
             else -> null
         }
     }
-
-    // Función de registro
     fun registrarse() {
-        // Validaciones finales (por si acaso)
+
         var hayError = false
 
         if (errorNombre != null) {
@@ -130,7 +133,6 @@ class RegistroViewModel : ViewModel() {
             return
         }
 
-        // Registrar en Firebase Authentication
         cargando = true
         errorGeneral = null
 
@@ -162,12 +164,23 @@ class RegistroViewModel : ViewModel() {
 
                 } else {
                     cargando = false
-                    val mensajeError = tarea.exception?.message ?: ""
-                    errorGeneral = when {
-                        mensajeError.contains("email-already-in-use") -> "📧 Este correo ya está registrado"
-                        mensajeError.contains("invalid-email") -> "✉️ Correo electrónico inválido"
-                        mensajeError.contains("weak-password") -> "🔐 La contraseña es muy débil"
-                        else -> "❌ Error al registrarse. Intenta nuevamente"
+                    val exception = tarea.exception
+
+                    errorGeneral = when (exception) {
+                        is com.google.firebase.auth.FirebaseAuthException -> {
+                            when (exception.errorCode) {
+
+                                "ERROR_EMAIL_ALREADY_IN_USE",
+                                "email-already-in-use",
+                                "auth/email-already-in-use" -> "📧 Este correo ya está registrado"
+
+                                // 🚫 Método no habilitado
+                                "ERROR_OPERATION_NOT_ALLOWED" -> "🚫 Registro con email no habilitado"
+
+                                else -> "❌ ${exception.localizedMessage ?: "Error al registrarse"}"
+                            }
+                        }
+                        else -> "❌ Error inesperado. Intenta nuevamente"
                     }
                 }
             }

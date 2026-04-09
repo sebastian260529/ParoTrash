@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.pantallas.PantallaBienvenida
 import com.example.parotrash.ui.pantallas.PantallaCodigoSatisfactorio
 import com.example.parotrash.ui.pantallas.PantallaHome
@@ -18,7 +19,10 @@ import com.example.parotrash.ui.viewmodel.RegistroViewModel
 
 @Composable
 fun NavegacionApp(
-    navController: NavHostController
+    navController: NavHostController,
+    startDestination: String,
+    sessionManager: SessionManager
+
 ) {
     val loginViewModel: InicioSesionViewModel = viewModel()
     val registroViewModel: RegistroViewModel = viewModel()
@@ -26,18 +30,18 @@ fun NavegacionApp(
 
     NavHost(
         navController = navController,
-        startDestination = Pantallas.Bienvenida.ruta
-    ) {
-        // Pantalla de Bienvenida
-        composable(Pantallas.Bienvenida.ruta) {
-            PantallaBienvenida(
-                irAInicioSesion = {
-                    navController.navigate(Pantallas.InicioSesion.ruta)
-                }
-            )
-        }
+        startDestination = startDestination,
 
-        // Pantalla de Inicio de Sesión
+    ) {
+        composable(Pantallas.Bienvenida.ruta) {
+        PantallaBienvenida(
+            irAInicioSesion = {
+                navController.navigate(Pantallas.InicioSesion.ruta)
+            },
+            sessionManager = sessionManager
+        )
+    }
+
         composable(Pantallas.InicioSesion.ruta) {
             PantallaInicioSesion(
                 viewModel = loginViewModel,
@@ -53,7 +57,8 @@ fun NavegacionApp(
                             inclusive = true
                         }
                     }
-                }
+                },
+                sessionManager = sessionManager
             )
         }
 
@@ -76,11 +81,11 @@ fun NavegacionApp(
         composable(Pantallas.RecuperarContrasena.ruta) {
             PantallaRecuperarContraseña(
                 viewModel = recuperarViewModel,
-                irAInicio = {
-                    navController.popBackStack()  // Volver atrás
+                irARegistro= {
+                    navController.navigate(Pantallas.Registrarse.ruta)
                 },
                 irACodigo = {
-                    navController.navigate(Pantallas.CodigoSatisfactorio.ruta)  // Ir a pantalla de éxito
+                    navController.navigate(Pantallas.CodigoSatisfactorio.ruta)
                 }
             )
         }
@@ -110,18 +115,19 @@ fun NavegacionApp(
             )
         }
 
-        // Pantalla Home (principal después de login)
         composable(Pantallas.Home.ruta) {
             PantallaHome(
+                viewModel = loginViewModel,
                 irACerrarSesion = {
-                    // Limpiar estado del ViewModel si es necesario
                     navController.navigate(Pantallas.InicioSesion.ruta) {
                         popUpTo(Pantallas.Home.ruta) {
                             inclusive = true
                         }
                     }
-                }
+                },
+                sessionManager = sessionManager
             )
         }
+
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,15 +22,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Check
+import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
 @Composable
 fun PantallaHome(
-    irACerrarSesion: () -> Unit
+    viewModel: InicioSesionViewModel,
+    irACerrarSesion: () -> Unit,
+    sessionManager: SessionManager
 ) {
-    // Estado para el loading del botón
-    var cargando by remember { mutableStateOf(false) }
+    var cerrandoSesion by remember { mutableStateOf(false) }
+
+    LaunchedEffect(cerrandoSesion) {
+        if (cerrandoSesion) {
+            viewModel.cerrarSesion(sessionManager) {
+                irACerrarSesion()
+            }
+            cerrandoSesion = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -39,14 +52,10 @@ fun PantallaHome(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Componente Check (éxito)
-        Check(
-            modifier = Modifier.size(80.dp),
-        )
+        Check(modifier = Modifier.size(80.dp))
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Título
         Text(
             text = "Inicio de sesión exitoso",
             fontSize = 24.sp,
@@ -57,14 +66,11 @@ fun PantallaHome(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botón "Cerrar Sesión" con loading
         BotonCargando(
             nombre = "Cerrar Sesión",
-            isLoading = cargando,
+            isLoading = cerrandoSesion,
             onClick = {
-                cargando = true
-                // Aquí puedes hacer alguna operación si es necesario
-                irACerrarSesion()
+                cerrandoSesion = true
             }
         )
     }

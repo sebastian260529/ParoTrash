@@ -33,14 +33,13 @@ fun PantallaCodigoSatisfactorio(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Componente Check
+
         Check(
             modifier = Modifier.size(80.dp)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Título
         Text(
             text = "Código enviado correctamente",
             fontSize = 24.sp,
@@ -51,7 +50,6 @@ fun PantallaCodigoSatisfactorio(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Subtítulo
         Text(
             text = "Revisa tu correo electrónico",
             fontSize = 16.sp,
@@ -61,7 +59,6 @@ fun PantallaCodigoSatisfactorio(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botón "Iniciar Sesión"
         BotonSimple(
             texto = "Iniciar Sesión",
             onClick = irAInicioSesion

@@ -33,7 +33,6 @@ import com.example.parotrash.ui.componentes.Logo
 
 @Composable
 fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irARegistroExitoso : () -> Unit) {
-    // Observar estados
     val nombre = viewModel.nombre
     val correo = viewModel.correo
     val contraseña = viewModel.contraseña
@@ -46,7 +45,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
     val errorGeneral = viewModel.errorGeneral
     val registroExitoso = viewModel.registroExitoso
 
-    // Navegar cuando sea exitoso
+
     LaunchedEffect(registroExitoso) {
         if (registroExitoso) {
             irARegistroExitoso()
@@ -59,9 +58,11 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             .background(Color.White)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+
     ) {
-        Logo(modifier = Modifier.size(140.dp))
+        Logo(modifier = Modifier.size(150.dp))
 
         Text(
             text = "Crear Cuenta",
@@ -72,7 +73,6 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo Nombre
         Formulario(
             icon1 = Icons.Default.AccountCircle,
             nombre = "Nombre",
@@ -82,7 +82,6 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             onTextChange = { viewModel.actualizarNombre(it) }
         )
 
-        // Campo Correo
         Formulario(
             icon1 = Icons.Default.Email,
             nombre = "Correo",
@@ -92,7 +91,6 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             onTextChange = { viewModel.actualizarCorreo(it) }
         )
 
-        // Campo Contraseña
         Formulario(
             icon1 = Icons.Default.Lock,
             nombre = "Contraseña",
@@ -101,8 +99,6 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             usuario = contraseña,
             onTextChange = { viewModel.actualizarContraseña(it) }
         )
-
-        // Campo Confirmar Contraseña
         Formulario(
             icon1 = Icons.Default.Lock,
             nombre = "Confirmar Contraseña",
@@ -112,7 +108,6 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             onTextChange = { viewModel.actualizarConfirmarContraseña(it) }
         )
 
-        // Error general
         if (errorGeneral != null) {
             Text(
                 text = errorGeneral ?: "",
@@ -124,7 +119,6 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Botón Registrarse
         BotonCargando(
             nombre = "Registrarse",
             isLoading = cargando,
@@ -133,7 +127,6 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Texto "¿Ya tienes cuenta?"
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

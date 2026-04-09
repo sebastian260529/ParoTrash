@@ -28,13 +28,14 @@ import com.example.parotrash.ui.viewmodel.RecuperarViewModel
 @Composable
 fun PantallaRecuperarContraseña(
     viewModel: RecuperarViewModel,
-    irAInicio: () -> Unit,
+    irARegistro: () -> Unit,
     irACodigo: () -> Unit
 ) {
     // Estados del ViewModel
     val correo = viewModel.correo
     val cargando = viewModel.cargando
     val correoEnviado = viewModel.correoEnviado
+    val mensaje = viewModel.mensaje
 
     // Navegar cuando el correo se envíe exitosamente
     LaunchedEffect(correoEnviado) {
@@ -70,7 +71,7 @@ fun PantallaRecuperarContraseña(
         Formulario(
             icon1 = Icons.Default.Email,
             nombre = "Correo",
-            abajo = null,
+            abajo =mensaje,
             icon2 = false,
             usuario = correo,
             onTextChange = { viewModel.actualizarCorreo(it) }
@@ -80,20 +81,26 @@ fun PantallaRecuperarContraseña(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Botón "Enviar correo"
         BotonCargando(
             nombre = "Enviar correo",
             isLoading = cargando,
             onClick = { viewModel.recuperarContraseña() }
         )
-
-        // Texto "Volver a Inicio de Sesión"
-        Text(
-            text = "Volver a Inicio de Sesión",
-            fontSize = 14.sp,
-            color = Color(0xFF03A9F4),
-            modifier = Modifier.clickable { irAInicio() }
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "¿No tienes cuenta? ",
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+            Text(
+                text = "Registrate",
+                fontSize = 14.sp,
+                color = Color(0xFF03A9F4),
+                modifier = Modifier.clickable { irARegistro() }
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
     }
