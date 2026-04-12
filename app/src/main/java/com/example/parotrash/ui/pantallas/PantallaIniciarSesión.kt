@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parotrash.data.SessionManager
-import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
+import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
 @Composable
 fun PantallaInicioSesion(
@@ -54,7 +55,7 @@ fun PantallaInicioSesion(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFFFFF))
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
@@ -65,7 +66,7 @@ fun PantallaInicioSesion(
             text = "Inicio Sesión",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF000000)
+            color = MaterialTheme.colorScheme.onPrimary
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -101,7 +102,7 @@ fun PantallaInicioSesion(
         Text(
             text = "¿Olvidó su contraseña?",
             fontSize = 14.sp,
-            color = Color(0xFF03A9F4),
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.clickable {
                 irARecuperar()
             }
@@ -125,12 +126,12 @@ fun PantallaInicioSesion(
             Text(
                 text = "¿No tienes cuenta? ",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.outline,
             )
             Text(
                 text = "Registrarte",
                 fontSize = 14.sp,
-                color = Color(0xFF03A9F4),
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable {
                     irARegistro()
                 }

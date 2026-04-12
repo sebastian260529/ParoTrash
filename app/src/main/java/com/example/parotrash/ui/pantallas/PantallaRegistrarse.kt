@@ -15,21 +15,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.parotrash.ui.viewmodel.RegistroViewModel
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
+import com.example.parotrash.ui.viewmodel.RegistroViewModel
 
 @Composable
 fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irARegistroExitoso : () -> Unit) {
@@ -55,7 +53,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -68,7 +66,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             text = "Crear Cuenta",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -111,7 +109,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
         if (errorGeneral != null) {
             Text(
                 text = errorGeneral ?: "",
-                color = Color.Red,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(8.dp)
             )
@@ -133,12 +131,12 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             Text(
                 text = "¿Ya tienes cuenta? ",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.outline
             )
             Text(
                 text = "Inicia Sesión",
                 fontSize = 14.sp,
-                color = Color(0xFF03A9F4),
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable { irAInicio() }
             )
         }

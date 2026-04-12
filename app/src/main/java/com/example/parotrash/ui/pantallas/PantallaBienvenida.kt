@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,7 +34,7 @@ fun PantallaBienvenida(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFFFFF))
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 24.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
@@ -50,7 +50,7 @@ fun PantallaBienvenida(
             text = "Bienvenido a ParoTrash",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF000000),
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
 
@@ -59,7 +59,7 @@ fun PantallaBienvenida(
         Text(
             text = "ParoTrash te ayuda a mantenerte informado sobre manifestaciones, bloqueos y afectaciones en la movilidad de la ciudad.",
             fontSize = 14.sp,
-            color = Color(0xFF666666),
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             lineHeight = 20.sp
         )
@@ -69,7 +69,7 @@ fun PantallaBienvenida(
         Text(
             text = "Consulta alertas en tiempo real, reporta puntos críticos y encuentra rutas alternativas para llegar a tu destino.",
             fontSize = 14.sp,
-            color = Color(0xFF666666),
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             lineHeight = 20.sp
         )

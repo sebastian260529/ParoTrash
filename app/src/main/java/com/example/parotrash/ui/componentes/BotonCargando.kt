@@ -8,10 +8,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -25,8 +25,8 @@ fun BotonCargando(
         enabled = !isLoading,
         shape = RoundedCornerShape(100.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFF9342B),
-            disabledContainerColor = Color(0xFFF9342B)
+            containerColor = MaterialTheme.colorScheme.primary,
+            disabledContainerColor = MaterialTheme.colorScheme.primary
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -35,11 +35,11 @@ fun BotonCargando(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(24.dp)
             )
         } else {
-            Text(nombre, color = Color.White)
+            Text(nombre, color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 }

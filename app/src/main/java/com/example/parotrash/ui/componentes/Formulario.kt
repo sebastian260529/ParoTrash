@@ -4,14 +4,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -21,12 +20,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -58,8 +55,8 @@ fun Formulario(icon1:ImageVector?,
                 .fillMaxWidth(),
             shape = RoundedCornerShape(40.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color(0xFFF9342B),
-                focusedBorderColor = Color(0xFFF9342B)
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = MaterialTheme.colorScheme.primary
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true,
@@ -72,7 +69,7 @@ fun Formulario(icon1:ImageVector?,
                     Icon(
                         imageVector = icon1,
                         contentDescription = null,
-                        tint = Color(0xFFF9342B)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             },
@@ -84,7 +81,7 @@ fun Formulario(icon1:ImageVector?,
                     Icon(
                         imageVector = icono,
                         contentDescription = null,
-                        tint = Color(0xFFF9342B),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable { ojo = !ojo }
                     )
                 }
