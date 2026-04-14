@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.BotonCargando
+import com.example.parotrash.ui.componentes.BotonSimple
 import com.example.parotrash.ui.componentes.Check
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 
@@ -31,6 +32,7 @@ import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 fun PantallaHome(
     viewModel: InicioSesionViewModel,
     irACerrarSesion: () -> Unit,
+    irAConfiguracion: () -> Unit, // Este es el callback que ya pasas por parámetro
     sessionManager: SessionManager
 ) {
     var cerrandoSesion by remember { mutableStateOf(false) }
@@ -66,11 +68,22 @@ fun PantallaHome(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Botón de Cerrar Sesión
         BotonCargando(
             nombre = "Cerrar Sesión",
             isLoading = cerrandoSesion,
             onClick = {
                 cerrandoSesion = true
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp)) // Reduje un poco el espacio para que quepan mejor
+
+        // Botón de Configuración actualizado
+        BotonSimple(
+            texto = "Configuración",
+            onClick = {
+                irAConfiguracion() // Llamada a la navegación
             }
         )
     }

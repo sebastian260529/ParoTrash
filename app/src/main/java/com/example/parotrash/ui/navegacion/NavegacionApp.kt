@@ -132,6 +132,7 @@ fun NavegacionApp(
                         }
                     }
                 },
+                irAConfiguracion = {navController.navigate(Pantallas.Configuracion.ruta)},
                 sessionManager = sessionManager
             )
         }
