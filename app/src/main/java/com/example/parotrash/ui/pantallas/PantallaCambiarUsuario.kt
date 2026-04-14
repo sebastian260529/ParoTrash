@@ -1,14 +1,7 @@
 package com.example.parotrash.ui.pantallas
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.MaterialTheme
@@ -20,20 +13,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
 import com.example.parotrash.ui.theme.ParoTrashTheme
+import com.example.parotrash.ui.viewmodel.CambiarUsuarioViewModel
 
 @Composable
 fun PantallaCambiarUsuario(
     irAHome: () -> Unit,
     irAConfiguracion: () -> Unit,
     irARegistroExitoso: () -> Unit,
-    irAConfirmarDescartarCambios: () -> Unit
+    irAConfirmarDescartarCambios: () -> Unit,
+    viewModel: CambiarUsuarioViewModel = viewModel()
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,6 +38,7 @@ fun PantallaCambiarUsuario(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Cabecera(
             texto = "Cambiar usuario",
             onBackClick = irAConfiguracion,
@@ -49,9 +47,7 @@ fun PantallaCambiarUsuario(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        Logo(
-            modifier = Modifier.size(120.dp)
-        )
+        Logo(modifier = Modifier.size(120.dp))
 
         Text(
             text = "Recuerda que al cambiar tu usuario lo puedes volver a cambiar luego de 7 dias.",
@@ -66,47 +62,45 @@ fun PantallaCambiarUsuario(
             verticalArrangement = Arrangement.spacedBy(40.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
+
+            // 👤 Usuario actual
             BotonInformacion(
                 icon1 = Icons.Default.AccountCircle,
                 texto = "Usuario actual",
-                onClick = {/* No hace nada*/}
-
+                valorFirebase = viewModel.usuarioActual,
+                onClick = {}
             )
 
+            // ✏️ Usuario nuevo
             Formulario(
                 icon1 = Icons.Default.AccountCircle,
                 nombre = "Usuario nuevo",
-                abajo = "Mínimo: 3 caracteres-Máximo: 30 caracteres",
+                abajo = viewModel.error,
                 icon2 = false,
-                usuario = "Usuario Nuevo",
-                onTextChange = { }
+                usuario = viewModel.nuevoUsuario,
+                onTextChange = { viewModel.onNuevoUsuarioChange(it) }
             )
 
+            // ✅ Confirmar cambios
             BotonCargando(
                 nombre = "Confirmar Cambios",
-                isLoading = false,
-                onClick = irARegistroExitoso
+                isLoading = viewModel.isLoading,
+                onClick = {
+                    viewModel.cambiarUsuario {
+                        irARegistroExitoso()
+                    }
+                }
             )
 
+            // ❌ Descartar cambios
             BotonCargando(
                 nombre = "Descartar Cambios",
                 isLoading = false,
-                onClick = irAConfirmarDescartarCambios
+                onClick = {
+                    viewModel.limpiar()
+                    irAConfirmarDescartarCambios()
+                }
             )
         }
-    }
-}
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PantallaCambiarUsuarioPreview() {
-    ParoTrashTheme() {
-        PantallaCambiarUsuario(
-            irAHome = {},
-            irAConfiguracion = {},
-            irARegistroExitoso = {},
-            irAConfirmarDescartarCambios = {}
-        )
     }
 }

@@ -2,14 +2,7 @@ package com.example.parotrash.ui.pantallas
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.MaterialTheme
@@ -20,11 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
 import com.example.parotrash.ui.theme.ParoTrashTheme
+import com.example.parotrash.ui.viewmodel.CambiarContrasenaViewModel
 
 @Composable
 fun PantallaCambiarContrasena(
@@ -32,11 +27,10 @@ fun PantallaCambiarContrasena(
     irAConfiguracion: () -> Unit,
     irARegistroExitoso: () -> Unit,
     irAConfirmarDescartarCambios: () -> Unit,
-    irARecuerarContrasena: () -> Unit
+    irARecuperarContrasena: () -> Unit,
+    viewModel: CambiarContrasenaViewModel = viewModel()
 ) {
-    val contrasenaActual = "Ab_1234567"
-    val nuevaContrasena = "Ab_1234567"
-    val error = "Error"
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,6 +38,7 @@ fun PantallaCambiarContrasena(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Cabecera(
             texto = "Cambiar Contraseña",
             onBackClick = irAConfiguracion,
@@ -52,9 +47,7 @@ fun PantallaCambiarContrasena(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        Logo(
-            modifier = Modifier.size(120.dp)
-        )
+        Logo(modifier = Modifier.size(120.dp))
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -62,43 +55,56 @@ fun PantallaCambiarContrasena(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
+
+            // 🔐 Contraseña actual
             Formulario(
                 icon1 = Icons.Default.Lock,
                 nombre = "Contraseña Actual",
-                abajo = error,
+                abajo = viewModel.error,
                 icon2 = true,
-                usuario = contrasenaActual,
-                onTextChange = { }
+                usuario = viewModel.contrasenaActual,
+                onTextChange = { viewModel.onContrasenaActualChange(it) }
             )
 
+            // 🔑 Nueva contraseña
             Formulario(
                 icon1 = Icons.Default.Lock,
                 nombre = "Contraseña Nueva",
-                abajo = error,
+                abajo = viewModel.error,
                 icon2 = true,
-                usuario = nuevaContrasena,
-                onTextChange = { }
+                usuario = viewModel.nuevaContrasena,
+                onTextChange = { viewModel.onNuevaContrasenaChange(it) }
             )
 
+            // 🔁 Confirmar contraseña
             Formulario(
                 icon1 = Icons.Default.Lock,
                 nombre = "Confirmar Contraseña Nueva",
-                abajo = error,
+                abajo = viewModel.error,
                 icon2 = true,
-                usuario = nuevaContrasena,
-                onTextChange = { }
+                usuario = viewModel.confirmarContrasena,
+                onTextChange = { viewModel.onConfirmarContrasenaChange(it) }
             )
 
+            // ✅ Confirmar cambios
             BotonCargando(
                 nombre = "Confirmar Cambios",
-                isLoading = false,
-                onClick = irARegistroExitoso
+                isLoading = viewModel.isLoading,
+                onClick = {
+                    viewModel.cambiarContrasena {
+                        irARegistroExitoso()
+                    }
+                }
             )
 
+            // ❌ Descartar cambios
             BotonCargando(
                 nombre = "Descartar Cambios",
                 isLoading = false,
-                onClick = irAConfirmarDescartarCambios
+                onClick = {
+                    viewModel.limpiar()
+                    irAConfirmarDescartarCambios()
+                }
             )
 
             Column(
@@ -114,25 +120,9 @@ fun PantallaCambiarContrasena(
                     text = "Recuperar contraseña",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.clickable { irARecuerarContrasena() }
+                    modifier = Modifier.clickable { irARecuperarContrasena() }
                 )
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PantallaCambiarContrasenaPreview() {
-    // Si usas un tema personalizado, envuélvelo en ParoTrashTheme { ... }
-    ParoTrashTheme(){
-        PantallaCambiarContrasena(
-            irAHome = {},
-            irAConfiguracion = {},
-            irARegistroExitoso = {},
-            irAConfirmarDescartarCambios = {},
-            irARecuerarContrasena = {}
-        )
     }
 }

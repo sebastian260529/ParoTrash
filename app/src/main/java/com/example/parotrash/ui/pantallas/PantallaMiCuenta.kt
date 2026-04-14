@@ -25,9 +25,12 @@ import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.componentes.Logo
 import com.example.parotrash.ui.theme.ParoTrashTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.parotrash.ui.viewmodel.MiCuentaViewModel
 
 @Composable
 fun PantallaMiCuenta(
+    viewModel: MiCuentaViewModel = viewModel(),
     irACambiarUsuario: () -> Unit,
     irACambiarCorreo: () -> Unit,
     irACambiarContrasena: () -> Unit,
@@ -63,7 +66,7 @@ fun PantallaMiCuenta(
                 icon1 = Icons.Default.AccountCircle,
                 texto = "Nombre de usuario",
                 // TODO: Falta poner los valores obtenidos del firabase
-                valorFirabase = {},
+                valorFirebase = viewModel.usuario,
                 onClick = irACambiarUsuario
             )
 
@@ -71,7 +74,7 @@ fun PantallaMiCuenta(
                 icon1 = Icons.Default.Email,
                 texto = "Correo electronico",
                 // TODO: Falta poner los valores obtenidos del firabase
-                valorFirabase = "se@gmail . com",
+                valorFirebase = viewModel.correo,
                 onClick = irACambiarCorreo
             )
 

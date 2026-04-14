@@ -36,11 +36,10 @@ import com.example.parotrash.ui.theme.ParoTrashTheme
 fun BotonInformacion(
     icon1: ImageVector,
     texto: String,
-    valorInicial: String = "",
+    valorFirebase: String = "",
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var valorFirebase by remember { mutableStateOf(valorInicial) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

@@ -7,9 +7,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.pantallas.PantallaBienvenida
+import com.example.parotrash.ui.pantallas.PantallaCambiarContrasena
+import com.example.parotrash.ui.pantallas.PantallaCambiarCorreo
+import com.example.parotrash.ui.pantallas.PantallaCambiarUsuario
 import com.example.parotrash.ui.pantallas.PantallaCodigoSatisfactorio
+import com.example.parotrash.ui.pantallas.PantallaConfiguracion
 import com.example.parotrash.ui.pantallas.PantallaHome
 import com.example.parotrash.ui.pantallas.PantallaInicioSesion
+import com.example.parotrash.ui.pantallas.PantallaMiCuenta
+import com.example.parotrash.ui.pantallas.PantallaNotificaciones
+import com.example.parotrash.ui.pantallas.PantallaPermisos
 import com.example.parotrash.ui.pantallas.PantallaRecuperarContraseña
 import com.example.parotrash.ui.pantallas.PantallaRegistrarse
 import com.example.parotrash.ui.pantallas.PantallaRegistroExitoso
@@ -128,6 +135,128 @@ fun NavegacionApp(
                 sessionManager = sessionManager
             )
         }
+        composable(Pantallas.Configuracion.ruta) {
+            PantallaConfiguracion(
+                irAMiCuenta = {
+                    navController.navigate(Pantallas.MiCuenta.ruta)
+                },
+                irANotificaciones = {
+                    navController.navigate(Pantallas.Notificaciones.ruta)
+                },
+                irAPrivacidad = {
+                    navController.navigate(Pantallas.Privacidad.ruta)
+                    },
+                IrAHome = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Pantallas.MiCuenta.ruta) {
+            PantallaMiCuenta(
+                irACambiarUsuario = {
+                    navController.navigate(Pantallas.CambiarUsuario.ruta)
+                },
+                irACambiarCorreo = {
+                    navController.navigate(Pantallas.CambiarCorreo.ruta)
+                },
+                irACambiarContrasena = {
+                    navController.navigate(Pantallas.CambiarContrasena.ruta)
+                },
+                irAHome = {
+                    navController.navigate(Pantallas.Home.ruta) {
+                        popUpTo(Pantallas.MiCuenta.ruta) { inclusive = true }
+                    }
+                },
+                irAConfiguracion = {
+                    navController.popBackStack()
+                },
+                irAinicoSesion = {
+                    navController.navigate(Pantallas.InicioSesion.ruta) {
+                        popUpTo(0)
+                    }
+                },
+                irAConfirmarBorrarCuenta = {
+                    // luego lo haces
+                }
+            )
+        }
+        composable(Pantallas.CambiarUsuario.ruta) {
+            PantallaCambiarUsuario(
+                irAHome = {
+                    navController.navigate(Pantallas.Home.ruta)
+                },
+                irAConfiguracion = {
+                    navController.popBackStack()
+                },
+                irARegistroExitoso = {
+                    navController.popBackStack()
+                },
+                irAConfirmarDescartarCambios = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Pantallas.CambiarCorreo.ruta) {
+            PantallaCambiarCorreo(
+                irAHome = {
+                    navController.navigate(Pantallas.Home.ruta)
+                },
+                irAConfiguracion = {
+                    navController.popBackStack()
+                },
+                irARegistroExitoso = {
+                    navController.popBackStack()
+                },
+                irAConfirmarDescartarCambios = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Pantallas.CambiarContrasena.ruta) {
+            PantallaCambiarContrasena(
+                irAHome = {
+                    navController.navigate(Pantallas.Home.ruta)
+                },
+                irAConfiguracion = {
+                    navController.popBackStack()
+                },
+                irARegistroExitoso = {
+                    navController.popBackStack()
+                },
+                irAConfirmarDescartarCambios = {
+                    navController.popBackStack()
+                },
+                irARecuperarContrasena = {
+                    navController.navigate(Pantallas.RecuperarContrasena.ruta)
+                }
+            )
+        }
+        composable(Pantallas.Notificaciones.ruta) {
+            PantallaNotificaciones(
+                irAHome = {
+                    navController.navigate(Pantallas.Home.ruta) {
+                        popUpTo(Pantallas.Notificaciones.ruta) { inclusive = true }
+                    }
+                },
+                irAConfiguracion = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Pantallas.Privacidad.ruta) {
+            PantallaPermisos(
+                irAHome = {
+                    navController.navigate(Pantallas.Home.ruta) {
+                        popUpTo(Pantallas.Privacidad.ruta) { inclusive = true }
+                    }
+                },
+                irAConfiguracion = {
+                    navController.popBackStack()
+                }
+            )
+        }
 
     }
+
 }

@@ -6,5 +6,5 @@ data class Usuario(
     val correo: String = "",
     val reputacion: Int = 0,
     val reportesHechos: Int = 0,
-    val fechaRegistro: Long = System.currentTimeMillis()
+    val fechaRegistro: Long = System.currentTimeMillis(),
 )

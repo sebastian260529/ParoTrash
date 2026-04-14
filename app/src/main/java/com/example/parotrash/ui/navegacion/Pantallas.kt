@@ -8,4 +8,11 @@ sealed class Pantallas(val ruta: String) {
     object CodigoSatisfactorio : Pantallas("codigo_satisfactorio")
     object RegistroExitoso : Pantallas("registro_exitoso")
     object Home : Pantallas("home")
+    object Configuracion : Pantallas("configuracion")
+    object MiCuenta : Pantallas("mi_cuenta")
+    object CambiarUsuario : Pantallas("cambiar_usuario")
+    object CambiarCorreo : Pantallas("cambiar_correo")
+    object CambiarContrasena : Pantallas("cambiar_contrasena")
+    object Notificaciones : Pantallas("notificaciones")
+    object Privacidad : Pantallas("privacidad")
 }
