@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parotrash.ui.componentes.BotonConSwitch
-import com.example.parotrash.ui.componentes.BotonSeleccionArchivo
+
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.theme.ParoTrashTheme
 
@@ -109,12 +109,6 @@ fun PantallaNotificaciones(
                 habilitado = recibirAlertas
             )
 
-            BotonSeleccionArchivo(
-                icon1 = Icons.Default.Notifications,
-                texto = "Sonido de Alerta",
-                nombreArchivo = "Sound.mp3",
-                onClick = {}
-            )
         }
     }
 }
