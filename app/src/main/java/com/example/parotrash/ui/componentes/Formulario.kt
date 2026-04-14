@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun Formulario(icon1:ImageVector?,
@@ -89,7 +90,10 @@ fun Formulario(icon1:ImageVector?,
         )
 
 
-        Text( text = abajo ?: "", )
+        Text( text = abajo ?: "",
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 12.sp
+        )
 
     }
 

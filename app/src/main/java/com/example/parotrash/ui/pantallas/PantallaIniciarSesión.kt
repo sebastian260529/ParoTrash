@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -92,7 +91,7 @@ fun PantallaInicioSesion(
         if (errorGeneral != null) {
             Text(
                 text = errorGeneral ?: "",
-                color = Color.Red,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(8.dp)
             )

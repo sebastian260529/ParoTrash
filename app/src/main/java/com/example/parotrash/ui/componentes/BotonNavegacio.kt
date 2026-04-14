@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -73,7 +73,7 @@ fun BotonNavegacion(
             )
 
             Icon(
-                imageVector = Icons.Default.ArrowForwardIos,
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(14.dp)
@@ -105,8 +105,7 @@ fun PreviewBotonMenuOpcion() {
             BotonNavegacion(
                 texto = "Cerrar sesión",
                 onClick = { },
-                icon1 = Icons.AutoMirrored.Filled.ExitToApp,
-                modifier = Modifier.padding(top = 8.dp)
+                icon1 = Icons.AutoMirrored.Filled.ExitToApp
             )
         }
     }
