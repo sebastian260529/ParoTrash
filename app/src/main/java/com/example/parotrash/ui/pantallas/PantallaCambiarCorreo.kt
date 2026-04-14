@@ -10,11 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.Cabecera
@@ -41,7 +43,7 @@ fun PantallaCambiarCorreo(
     ) {
 
         Cabecera(
-            texto = "Cambiar correo",
+            texto = stringResource(R.string.cambiar_correo),
             onBackClick = irAConfiguracion,
             onCloseClick = irAHome
         )
@@ -51,7 +53,7 @@ fun PantallaCambiarCorreo(
         Logo(modifier = Modifier.size(120.dp))
 
         Text(
-            text = "Asegurate de poner un correo electronico válido al que tengas acceso.",
+            text = stringResource(R.string.descripcion_3),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center
@@ -67,7 +69,7 @@ fun PantallaCambiarCorreo(
             // 📧 Correo actual (desde Firebase)
             BotonInformacion(
                 icon1 = Icons.Default.Email,
-                texto = "Correo actual",
+                texto = stringResource(R.string.correo_actual),
                 valorFirebase = viewModel.correoActual,
                 onClick = {}
             )
@@ -75,7 +77,7 @@ fun PantallaCambiarCorreo(
             // 📧 Nuevo correo
             Formulario(
                 icon1 = Icons.Default.Email,
-                nombre = "Correo nuevo",
+                nombre = stringResource(R.string.correo_nuevo),
                 abajo = viewModel.error,
                 icon2 = false,
                 usuario = viewModel.nuevoCorreo,
@@ -85,7 +87,7 @@ fun PantallaCambiarCorreo(
             // 🔐 Contraseña (IMPORTANTE)
             Formulario(
                 icon1 = Icons.Default.Lock,
-                nombre = "Contraseña",
+                nombre = stringResource(R.string.contrase_a),
                 abajo = viewModel.error,
                 icon2 = true,
                 usuario = viewModel.contrasena,
@@ -94,7 +96,7 @@ fun PantallaCambiarCorreo(
 
             // ✅ Confirmar cambios
             BotonCargando(
-                nombre = "Confirmar Cambios",
+                nombre = stringResource(R.string.confirmar_1),
                 isLoading = viewModel.isLoading,
                 onClick = {
                     viewModel.cambiarCorreo {
@@ -105,7 +107,7 @@ fun PantallaCambiarCorreo(
 
             // ❌ Descartar cambios
             BotonCargando(
-                nombre = "Descartar Cambios",
+                nombre = stringResource(R.string.descartar_cambios_1),
                 isLoading = false,
                 onClick = {
                     viewModel.limpiar()

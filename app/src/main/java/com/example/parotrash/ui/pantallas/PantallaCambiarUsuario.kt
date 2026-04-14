@@ -9,11 +9,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.Cabecera
@@ -40,7 +42,7 @@ fun PantallaCambiarUsuario(
     ) {
 
         Cabecera(
-            texto = "Cambiar usuario",
+            texto = stringResource(R.string.cambiar_usuario),
             onBackClick = irAConfiguracion,
             onCloseClick = irAHome
         )
@@ -50,7 +52,7 @@ fun PantallaCambiarUsuario(
         Logo(modifier = Modifier.size(120.dp))
 
         Text(
-            text = "Recuerda que al cambiar tu usuario lo puedes volver a cambiar luego de 7 dias.",
+            text = stringResource(R.string.descripcion_4),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center
@@ -66,7 +68,7 @@ fun PantallaCambiarUsuario(
             // 👤 Usuario actual
             BotonInformacion(
                 icon1 = Icons.Default.AccountCircle,
-                texto = "Usuario actual",
+                texto = stringResource(R.string.usuario_actual),
                 valorFirebase = viewModel.usuarioActual,
                 onClick = {}
             )
@@ -74,7 +76,7 @@ fun PantallaCambiarUsuario(
             // ✏️ Usuario nuevo
             Formulario(
                 icon1 = Icons.Default.AccountCircle,
-                nombre = "Usuario nuevo",
+                nombre = stringResource(R.string.usuario_nuevo),
                 abajo = viewModel.error,
                 icon2 = false,
                 usuario = viewModel.nuevoUsuario,
@@ -83,7 +85,7 @@ fun PantallaCambiarUsuario(
 
             // ✅ Confirmar cambios
             BotonCargando(
-                nombre = "Confirmar Cambios",
+                nombre = stringResource(R.string.confirmar_cambios_1),
                 isLoading = viewModel.isLoading,
                 onClick = {
                     viewModel.cambiarUsuario {
@@ -94,7 +96,7 @@ fun PantallaCambiarUsuario(
 
             // ❌ Descartar cambios
             BotonCargando(
-                nombre = "Descartar Cambios",
+                nombre = stringResource(R.string.descartar_cambios_2),
                 isLoading = false,
                 onClick = {
                     viewModel.limpiar()

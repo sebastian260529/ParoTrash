@@ -21,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
@@ -63,7 +65,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
         Logo(modifier = Modifier.size(150.dp))
 
         Text(
-            text = "Crear Cuenta",
+            text = stringResource(R.string.crear_cuenta),
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
@@ -73,7 +75,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
 
         Formulario(
             icon1 = Icons.Default.AccountCircle,
-            nombre = "Nombre",
+            nombre = stringResource(R.string.nombre),
             abajo = errorNombre,
             icon2 = false,
             usuario = nombre,
@@ -82,7 +84,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
 
         Formulario(
             icon1 = Icons.Default.Email,
-            nombre = "Correo",
+            nombre = stringResource(R.string.correo_1),
             abajo = errorCorreo,
             icon2 = false,
             usuario = correo,
@@ -91,7 +93,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
 
         Formulario(
             icon1 = Icons.Default.Lock,
-            nombre = "Contraseña",
+            nombre = stringResource(R.string.contrase_a_3),
             abajo = errorContraseña,
             icon2 = true,
             usuario = contraseña,
@@ -99,7 +101,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
         )
         Formulario(
             icon1 = Icons.Default.Lock,
-            nombre = "Confirmar Contraseña",
+            nombre = stringResource(R.string.confirmar_contrase_a),
             abajo = errorConfirmar,
             icon2 = true,
             usuario = confirmarContraseña,
@@ -118,7 +120,7 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
         Spacer(modifier = Modifier.height(8.dp))
 
         BotonCargando(
-            nombre = "Registrarse",
+            nombre = stringResource(R.string.registrarse),
             isLoading = cargando,
             onClick = { viewModel.registrarse() }
         )
@@ -129,12 +131,12 @@ fun PantallaRegistrarse(viewModel: RegistroViewModel, irAInicio: () -> Unit, irA
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "¿Ya tienes cuenta? ",
+                text = stringResource(R.string.ya_tienes_cuenta),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.outline
             )
             Text(
-                text = "Inicia Sesión",
+                text = stringResource(R.string.inicia_sesi_n),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable { irAInicio() }

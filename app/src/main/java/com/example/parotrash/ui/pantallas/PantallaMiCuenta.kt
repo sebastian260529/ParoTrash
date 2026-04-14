@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.parotrash.ui.componentes.BotonCargando
@@ -26,6 +27,7 @@ import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.componentes.Logo
 import com.example.parotrash.ui.theme.ParoTrashTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.parotrash.R
 import com.example.parotrash.ui.viewmodel.MiCuentaViewModel
 
 @Composable
@@ -48,7 +50,7 @@ fun PantallaMiCuenta(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Cabecera(
-            texto = "Mi Cuenta",
+            texto = stringResource(R.string.mi_cuenta_1),
             onBackClick = irAConfiguracion,
             onCloseClick = irAHome
         )
@@ -64,7 +66,7 @@ fun PantallaMiCuenta(
         ) {
             BotonInformacion(
                 icon1 = Icons.Default.AccountCircle,
-                texto = "Nombre de usuario",
+                texto = stringResource(R.string.nombre_de_usuario),
                 // TODO: Falta poner los valores obtenidos del firabase
                 valorFirebase = viewModel.usuario,
                 onClick = irACambiarUsuario
@@ -72,7 +74,7 @@ fun PantallaMiCuenta(
 
             BotonInformacion(
                 icon1 = Icons.Default.Email,
-                texto = "Correo electronico",
+                texto = stringResource(R.string.correo_electronico),
                 // TODO: Falta poner los valores obtenidos del firabase
                 valorFirebase = viewModel.correo,
                 onClick = irACambiarCorreo
@@ -80,7 +82,7 @@ fun PantallaMiCuenta(
 
             BotonInformacion(
                 icon1 = Icons.Default.Lock,
-                texto = "Contraseña",
+                texto = stringResource(R.string.contrase_a_2),
                 onClick = irACambiarContrasena
             )
 
@@ -88,13 +90,13 @@ fun PantallaMiCuenta(
                 icon1 = Icons.AutoMirrored.Filled.ExitToApp,
                 isLoading = false,
                 onClick = irAinicoSesion,
-                nombre = "Cerrar Sesión"
+                nombre = stringResource(R.string.cerrar_sesi_n_2)
             )
 
             BotonCargando(
                 isLoading = false,
                 onClick = irAConfirmarBorrarCuenta,
-                nombre = "Eliminar Cuenta"
+                nombre = stringResource(R.string.eliminar_cuenta)
             )
         }
     }

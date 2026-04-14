@@ -13,10 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonSimple
 import com.example.parotrash.ui.componentes.Check
 
@@ -42,7 +44,7 @@ fun PantallaRegistroExitoso(
 
         // Título
         Text(
-            text = "Registro Exitoso",
+            text = stringResource(R.string.registro_exitoso),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -52,7 +54,7 @@ fun PantallaRegistroExitoso(
         Spacer(modifier = Modifier.height(32.dp))
 
         BotonSimple(
-            texto = "Iniciar Sesión",
+            texto = stringResource(R.string.iniciar_sesi_n_1),
             onClick = irAInicioSesion
         )
     }

@@ -18,10 +18,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.BotonSimple
@@ -59,7 +61,7 @@ fun PantallaHome(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Inicio de sesión exitoso",
+            text = stringResource(R.string.inicio_de_sesi_n_exitoso),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -70,7 +72,7 @@ fun PantallaHome(
 
         // Botón de Cerrar Sesión
         BotonCargando(
-            nombre = "Cerrar Sesión",
+            nombre = stringResource(R.string.cerrar_sesi_n),
             isLoading = cerrandoSesion,
             onClick = {
                 cerrandoSesion = true
@@ -81,7 +83,7 @@ fun PantallaHome(
 
         // Botón de Configuración actualizado
         BotonSimple(
-            texto = "Configuración",
+            texto = stringResource(R.string.configuraci_n_1),
             onClick = {
                 irAConfiguracion() // Llamada a la navegación
             }

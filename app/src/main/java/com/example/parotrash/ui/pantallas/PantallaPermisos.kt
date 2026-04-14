@@ -20,9 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonConSwitch
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.theme.ParoTrashTheme
@@ -44,7 +46,7 @@ fun PantallaPermisos(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Cabecera(
-            texto = "Privacidad",
+            texto = stringResource(R.string.privacidad_1),
             onBackClick = irAConfiguracion,
             onCloseClick = irAHome
         )
@@ -52,7 +54,7 @@ fun PantallaPermisos(
         Spacer(modifier = Modifier.height(30.dp))
 
         Text(
-            text = "Administra los permisos de la app para acceder a la ubicación, notificaciones y almacenamiento.",
+            text = stringResource(R.string.descripcion_5),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.outline
         )
@@ -65,26 +67,26 @@ fun PantallaPermisos(
         ) {
             BotonConSwitch(
                 icon1 = Icons.Default.PushPin,
-                texto = "Ubicación",
+                texto = stringResource(R.string.ubicaci_n),
                 estaActivado = ubicacion,
                 onCheckedChange = { ubicacion = it },
-                descripcion = "Permitir acceso a tu ubicación."
+                descripcion = stringResource(R.string.permitir_acceso_a_tu_ubicaci_n)
             )
 
             BotonConSwitch(
                 icon1 = Icons.Default.Notifications,
-                texto = "Notificaciones",
+                texto = stringResource(R.string.notificaciones_3),
                 estaActivado = notificaciones,
                 onCheckedChange = { notificaciones = it },
-                descripcion = "Permitir recibir alertas y notificaciones en tu dispositivo."
+                descripcion = stringResource(R.string.descripcion_6)
             )
 
             BotonConSwitch(
                 icon1 = Icons.Default.PushPin,
-                texto = "Almacenamiento",
+                texto = stringResource(R.string.almacenamiento),
                 estaActivado = almacenamiento,
                 onCheckedChange = { almacenamiento = it },
-                descripcion = "Permitir acceso al almacenamiento de tu dispositivo."
+                descripcion = stringResource(R.string.descripcion_7)
             )
         }
     }

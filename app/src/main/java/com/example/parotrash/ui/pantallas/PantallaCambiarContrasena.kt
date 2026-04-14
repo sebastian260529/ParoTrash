@@ -10,10 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.componentes.Formulario
@@ -40,7 +42,7 @@ fun PantallaCambiarContrasena(
     ) {
 
         Cabecera(
-            texto = "Cambiar Contraseña",
+            texto = stringResource(R.string.cambiar_contrase_a),
             onBackClick = irAConfiguracion,
             onCloseClick = irAHome
         )
@@ -59,7 +61,7 @@ fun PantallaCambiarContrasena(
             // 🔐 Contraseña actual
             Formulario(
                 icon1 = Icons.Default.Lock,
-                nombre = "Contraseña Actual",
+                nombre = stringResource(R.string.contrase_a_actual),
                 abajo = viewModel.error,
                 icon2 = true,
                 usuario = viewModel.contrasenaActual,
@@ -69,7 +71,7 @@ fun PantallaCambiarContrasena(
             // 🔑 Nueva contraseña
             Formulario(
                 icon1 = Icons.Default.Lock,
-                nombre = "Contraseña Nueva",
+                nombre = stringResource(R.string.contrase_a_nueva),
                 abajo = viewModel.error,
                 icon2 = true,
                 usuario = viewModel.nuevaContrasena,
@@ -79,7 +81,7 @@ fun PantallaCambiarContrasena(
             // 🔁 Confirmar contraseña
             Formulario(
                 icon1 = Icons.Default.Lock,
-                nombre = "Confirmar Contraseña Nueva",
+                nombre = stringResource(R.string.confirmar_contrase_a_nueva),
                 abajo = viewModel.error,
                 icon2 = true,
                 usuario = viewModel.confirmarContrasena,
@@ -88,7 +90,7 @@ fun PantallaCambiarContrasena(
 
             // ✅ Confirmar cambios
             BotonCargando(
-                nombre = "Confirmar Cambios",
+                nombre = stringResource(R.string.confirmar_cambios),
                 isLoading = viewModel.isLoading,
                 onClick = {
                     viewModel.cambiarContrasena {
@@ -99,7 +101,7 @@ fun PantallaCambiarContrasena(
 
             // ❌ Descartar cambios
             BotonCargando(
-                nombre = "Descartar Cambios",
+                nombre = stringResource(R.string.descartar_cambios),
                 isLoading = false,
                 onClick = {
                     viewModel.limpiar()
@@ -112,12 +114,12 @@ fun PantallaCambiarContrasena(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "¿Olvidaste tu contraseña?",
+                    text = stringResource(R.string.olvidaste_tu_contrase_a),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.outline
                 )
                 Text(
-                    text = "Recuperar contraseña",
+                    text = stringResource(R.string.recuperar_contrase_a),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.clickable { irARecuperarContrasena() }

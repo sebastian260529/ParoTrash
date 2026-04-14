@@ -18,9 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Formulario
@@ -62,7 +64,7 @@ fun PantallaInicioSesion(
         Logo(modifier = Modifier.size(160.dp))
 
         Text(
-            text = "Inicio Sesión",
+            text = stringResource(R.string.inicio_sesi_n),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimary
@@ -72,7 +74,7 @@ fun PantallaInicioSesion(
 
         Formulario(
             icon1 = Icons.Default.Email,
-            nombre = "Correo",
+            nombre = stringResource(R.string.correo),
             abajo = errorCorreo,
             icon2 = false,
             usuario = correo,
@@ -81,7 +83,7 @@ fun PantallaInicioSesion(
 
         Formulario(
             icon1 = Icons.Default.Lock,
-            nombre = "Contraseña",
+            nombre = stringResource(R.string.contrase_a_1),
             abajo = errorContrasena,
             icon2 = true,
             usuario = contrasena,
@@ -99,7 +101,7 @@ fun PantallaInicioSesion(
 
 
         Text(
-            text = "¿Olvidó su contraseña?",
+            text = stringResource(R.string.olvid_su_contrase_a),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.clickable {
@@ -108,12 +110,12 @@ fun PantallaInicioSesion(
         )
 
         BotonCargando(
-            nombre = "Iniciar Sesión",
+            nombre = stringResource(R.string.iniciar_sesi_n_2),
             isLoading = cargando,
             onClick = { viewModel.iniciarSesion() }
         )
         BotonCargando(
-            nombre = "Continuar Como Invitado",
+            nombre = stringResource(R.string.continuar_como_invitado),
             isLoading = false,
             onClick = { viewModel.iniciarComoInvitado() }
         )
@@ -123,12 +125,12 @@ fun PantallaInicioSesion(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "¿No tienes cuenta? ",
+                text = stringResource(R.string.no_tienes_cuenta),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.outline,
             )
             Text(
-                text = "Registrarte",
+                text = stringResource(R.string.registrarte),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable {

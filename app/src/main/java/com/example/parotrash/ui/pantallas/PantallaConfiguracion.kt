@@ -17,8 +17,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonNavegacion
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.componentes.Logo
@@ -39,7 +41,7 @@ fun PantallaConfiguracion(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Cabecera(
-            texto = "Configuración",
+            texto = stringResource(R.string.configuraci_n),
             onCloseClick = IrAHome
         )
 
@@ -52,17 +54,17 @@ fun PantallaConfiguracion(
             modifier = Modifier.fillMaxWidth()
         ) {
             BotonNavegacion(
-                texto = "Mi cuenta",
+                texto = stringResource(R.string.mi_cuenta),
                 icon1 = Icons.Default.AccountCircle,
                 onClick = irAMiCuenta
             )
             BotonNavegacion(
-                texto = "Notificaciones",
+                texto = stringResource(R.string.notificaciones),
                 icon1 = Icons.Default.Notifications,
                 onClick = irANotificaciones
             )
             BotonNavegacion(
-                texto = "Privacidad",
+                texto = stringResource(R.string.privacidad),
                 icon1 = Icons.Default.Lock,
                 onClick = irAPrivacidad
             )

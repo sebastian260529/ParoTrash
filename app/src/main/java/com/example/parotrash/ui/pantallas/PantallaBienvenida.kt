@@ -15,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.BotonSimple
 import com.example.parotrash.ui.componentes.Logo
@@ -47,7 +49,7 @@ fun PantallaBienvenida(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Bienvenido a ParoTrash",
+            text = stringResource(R.string.bienvenido_a_parotrash),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -57,7 +59,7 @@ fun PantallaBienvenida(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "ParoTrash te ayuda a mantenerte informado sobre manifestaciones, bloqueos y afectaciones en la movilidad de la ciudad.",
+            text = stringResource(R.string.descripcion_2),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -67,7 +69,7 @@ fun PantallaBienvenida(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Consulta alertas en tiempo real, reporta puntos críticos y encuentra rutas alternativas para llegar a tu destino.",
+            text = stringResource(R.string.descripcion_1),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,

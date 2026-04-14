@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.Logo
@@ -59,7 +61,7 @@ fun PantallaRecuperarContraseña(
 
         // Título
         Text(
-            text = "Recuperar Contraseña",
+            text = stringResource(R.string.recuperar_contrase_a_1),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
@@ -70,7 +72,7 @@ fun PantallaRecuperarContraseña(
         // Campo Correo
         Formulario(
             icon1 = Icons.Default.Email,
-            nombre = "Correo",
+            nombre = stringResource(R.string.correo_2),
             abajo =mensaje,
             icon2 = false,
             usuario = correo,
@@ -82,7 +84,7 @@ fun PantallaRecuperarContraseña(
         Spacer(modifier = Modifier.height(8.dp))
 
         BotonCargando(
-            nombre = "Enviar correo",
+            nombre = stringResource(R.string.enviar_correo),
             isLoading = cargando,
             onClick = { viewModel.recuperarContraseña() }
         )
@@ -90,12 +92,12 @@ fun PantallaRecuperarContraseña(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "¿No tienes cuenta? ",
+                text = stringResource(R.string.no_tienes_cuenta_1),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.outline
             )
             Text(
-                text = "Registrate",
+                text = stringResource(R.string.registrate),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable { irARegistro() }

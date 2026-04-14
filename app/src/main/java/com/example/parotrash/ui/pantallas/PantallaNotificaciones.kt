@@ -24,9 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parotrash.R
 import com.example.parotrash.ui.componentes.BotonConSwitch
 
 import com.example.parotrash.ui.componentes.Cabecera
@@ -51,7 +53,7 @@ fun PantallaNotificaciones(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Cabecera(
-            texto = "Notificaciones",
+            texto = stringResource(R.string.notificaciones_1),
             onBackClick = irAConfiguracion,
             onCloseClick = irAHome
         )
@@ -60,7 +62,7 @@ fun PantallaNotificaciones(
 
         BotonConSwitch(
             icon1 = Icons.Default.Info,
-            texto = "Recibir alertas",
+            texto = stringResource(R.string.recibir_alertas),
             estaActivado = recibirAlertas,
             onCheckedChange = { recibirAlertas = it }
         )
@@ -72,14 +74,14 @@ fun PantallaNotificaciones(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Notificaciones",
+                text = stringResource(R.string.notificaciones_2),
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.outline
             )
 
             BotonConSwitch(
                 icon1 = Icons.Default.DirectionsCar,
-                texto = "Bloqueos Viales",
+                texto = stringResource(R.string.bloqueos_viales_1),
                 estaActivado = bloqueosViales,
                 onCheckedChange = { bloqueosViales = it },
                 habilitado = recibirAlertas
@@ -87,7 +89,7 @@ fun PantallaNotificaciones(
 
             BotonConSwitch(
                 icon1 = Icons.Default.EmojiPeople,
-                texto = "Manifestaciones",
+                texto = stringResource(R.string.manifestaciones_1),
                 estaActivado = manifestaciones,
                 onCheckedChange = { manifestaciones = it },
                 habilitado = recibirAlertas
@@ -95,7 +97,7 @@ fun PantallaNotificaciones(
 
             BotonConSwitch(
                 icon1 = Icons.Default.Warning,
-                texto = "Rutas Alternativas",
+                texto = stringResource(R.string.rutas_alternativas_1),
                 estaActivado = rutasAlternativas,
                 onCheckedChange = { rutasAlternativas = it },
                 habilitado = recibirAlertas
@@ -103,7 +105,7 @@ fun PantallaNotificaciones(
 
             BotonConSwitch(
                 icon1 = Icons.Default.People,
-                texto = "Comunidad",
+                texto = stringResource(R.string.comunidad),
                 estaActivado = comunidad,
                 onCheckedChange = { comunidad = it },
                 habilitado = recibirAlertas
