@@ -61,9 +61,9 @@ fun PantallaMiCuenta(
         ) {
             BotonInformacion(
                 icon1 = Icons.Default.AccountCircle,
-                texto = "Nombre de usiario",
+                texto = "Nombre de usuario",
                 // TODO: Falta poner los valores obtenidos del firabase
-                valorFirabase = "ayuiAS8763489",
+                valorFirabase = {},
                 onClick = irACambiarUsuario
             )
 

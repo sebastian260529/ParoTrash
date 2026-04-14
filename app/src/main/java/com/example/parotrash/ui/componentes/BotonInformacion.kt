@@ -17,6 +17,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,17 +36,19 @@ import com.example.parotrash.ui.theme.ParoTrashTheme
 fun BotonInformacion(
     icon1: ImageVector,
     texto: String,
-    valorFirabase: String? = null,
+    valorInicial: String = "",
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var valorFirebase by remember { mutableStateOf(valorInicial) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .height(55.dp)
             .padding(horizontal = 5.dp)
-            .clip(RoundedCornerShape(40.dp)) // Asegura que el efecto de clic sea redondeado
+            .clip(RoundedCornerShape(40.dp))
             .clickable { onClick() }
             .border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(40.dp))
             .background(MaterialTheme.colorScheme.background)
@@ -66,10 +72,10 @@ fun BotonInformacion(
             modifier = Modifier.weight(1f)
         )
 
-        if (!valorFirabase.isNullOrEmpty()) {
+        if (valorFirebase.isNotEmpty()) {
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = valorFirabase,
+                text = valorFirebase,
                 color = MaterialTheme.colorScheme.outline,
                 fontSize = 14.sp,
                 maxLines = 1,
@@ -81,16 +87,3 @@ fun BotonInformacion(
     }
 }
 
-@Composable
-@Preview
-fun PreviewBotonInformacion() {
-    ParoTrashTheme() {
-        BotonInformacion(
-            icon1 = Icons.Default.Lock,
-            texto = "Contraseña",
-            valorFirabase = "aaaaaaaaaaaassssssssssssssdddddddddddddd",
-            onClick = {}
-        )
-    }
-
-}
