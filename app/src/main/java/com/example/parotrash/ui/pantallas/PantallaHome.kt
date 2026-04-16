@@ -34,7 +34,7 @@ import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 fun PantallaHome(
     viewModel: InicioSesionViewModel,
     irACerrarSesion: () -> Unit,
-    irAConfiguracion: () -> Unit, // Este es el callback que ya pasas por parámetro
+    irAConfiguracion: () -> Unit,
     sessionManager: SessionManager
 ) {
     var cerrandoSesion by remember { mutableStateOf(false) }
@@ -70,7 +70,6 @@ fun PantallaHome(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botón de Cerrar Sesión
         BotonCargando(
             nombre = stringResource(R.string.cerrar_sesi_n),
             isLoading = cerrandoSesion,
@@ -79,13 +78,12 @@ fun PantallaHome(
             }
         )
 
-        Spacer(modifier = Modifier.height(16.dp)) // Reduje un poco el espacio para que quepan mejor
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón de Configuración actualizado
         BotonSimple(
             texto = stringResource(R.string.configuraci_n_1),
             onClick = {
-                irAConfiguracion() // Llamada a la navegación
+                irAConfiguracion()
             }
         )
     }

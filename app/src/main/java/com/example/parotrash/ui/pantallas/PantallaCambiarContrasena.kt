@@ -58,7 +58,6 @@ fun PantallaCambiarContrasena(
             modifier = Modifier.fillMaxWidth()
         ) {
 
-            // 🔐 Contraseña actual
             Formulario(
                 icon1 = Icons.Default.Lock,
                 nombre = stringResource(R.string.contrase_a_actual),
@@ -68,7 +67,7 @@ fun PantallaCambiarContrasena(
                 onTextChange = { viewModel.onContrasenaActualChange(it) }
             )
 
-            // 🔑 Nueva contraseña
+
             Formulario(
                 icon1 = Icons.Default.Lock,
                 nombre = stringResource(R.string.contrase_a_nueva),
@@ -78,7 +77,7 @@ fun PantallaCambiarContrasena(
                 onTextChange = { viewModel.onNuevaContrasenaChange(it) }
             )
 
-            // 🔁 Confirmar contraseña
+
             Formulario(
                 icon1 = Icons.Default.Lock,
                 nombre = stringResource(R.string.confirmar_contrase_a_nueva),
@@ -88,7 +87,6 @@ fun PantallaCambiarContrasena(
                 onTextChange = { viewModel.onConfirmarContrasenaChange(it) }
             )
 
-            // ✅ Confirmar cambios
             BotonCargando(
                 nombre = stringResource(R.string.confirmar_cambios),
                 isLoading = viewModel.isLoading,
@@ -99,7 +97,6 @@ fun PantallaCambiarContrasena(
                 }
             )
 
-            // ❌ Descartar cambios
             BotonCargando(
                 nombre = stringResource(R.string.descartar_cambios),
                 isLoading = false,
@@ -128,4 +125,3 @@ fun PantallaCambiarContrasena(
         }
     }
 }
-//asasasas

@@ -4,8 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.parotrash.data.SessionManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 class MiCuentaViewModel : ViewModel() {
 
@@ -33,7 +36,7 @@ class MiCuentaViewModel : ViewModel() {
                 .document(uid)
                 .get()
                 .addOnSuccessListener {
-                    usuario = it.getString("usuario") ?: ""
+                    usuario = it.getString("nombre") ?: ""
                 }
         }
     }

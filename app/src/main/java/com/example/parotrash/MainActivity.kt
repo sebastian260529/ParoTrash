@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.example.parotrash.data.NotificationPreferences
+import com.example.parotrash.data.PermissionPreferences
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.navegacion.NavegacionApp
 import com.example.parotrash.ui.navegacion.Pantallas
@@ -34,15 +36,25 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ParoTrashTheme {
+                val notificationPreferences = remember { NotificationPreferences(this) }
+                val permissionPreferences = remember { PermissionPreferences(this) }
                 val sessionManager = SessionManager(this)
-                ParotrashApp(sessionManager = sessionManager)
+                ParotrashApp(
+                    sessionManager = sessionManager,
+                    notificationPreferences = notificationPreferences,
+                    permissionPreferences = permissionPreferences
+                )
             }
         }
     }
 }
 
 @Composable
-fun ParotrashApp(sessionManager: SessionManager) {
+fun ParotrashApp(
+    sessionManager: SessionManager,
+    notificationPreferences: NotificationPreferences,
+    permissionPreferences: PermissionPreferences
+) {
     val isLoggedIn by sessionManager.isLoggedIn.collectAsState(initial = false)
     val isFirstTime by sessionManager.isFirstTime.collectAsState(initial = true)
 
@@ -58,7 +70,6 @@ fun ParotrashApp(sessionManager: SessionManager) {
     }
 
     if (startDestination == null) {
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,7 +86,9 @@ fun ParotrashApp(sessionManager: SessionManager) {
         NavegacionApp(
             navController = rememberNavController(),
             startDestination = startDestination!!,
-            sessionManager = sessionManager
+            sessionManager = sessionManager,
+            notificationPreferences = notificationPreferences,
+            permissionPreferences = permissionPreferences
         )
     }
 }

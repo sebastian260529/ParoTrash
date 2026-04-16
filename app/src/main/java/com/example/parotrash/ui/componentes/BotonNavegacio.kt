@@ -83,30 +83,3 @@ fun BotonNavegacion(
     }
 }
 
-
-@Preview(showBackground = true, name = "Botón Mi Cuenta")
-@Composable
-fun PreviewBotonMenuOpcion() {
-    ParoTrashTheme() {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Estado normal
-            BotonNavegacion(
-                texto = "Mi cuenta",
-                onClick = { /* Acción de prueba */ },
-                icon1 = Icons.Default.AccountCircle
-            )
-
-            // Ejemplo reutilizándolo para otra opción (Cerrar sesión)
-            BotonNavegacion(
-                texto = "Cerrar sesión",
-                onClick = { },
-                icon1 = Icons.AutoMirrored.Filled.ExitToApp
-            )
-        }
-    }
-}

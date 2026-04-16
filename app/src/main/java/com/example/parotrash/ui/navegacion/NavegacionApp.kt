@@ -5,6 +5,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.parotrash.data.NotificationPreferences
+import com.example.parotrash.data.PermissionPreferences
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.pantallas.PantallaBienvenida
 import com.example.parotrash.ui.pantallas.PantallaCambiarContrasena
@@ -28,7 +30,9 @@ import com.example.parotrash.ui.viewmodel.RegistroViewModel
 fun NavegacionApp(
     navController: NavHostController,
     startDestination: String,
-    sessionManager: SessionManager
+    sessionManager: SessionManager,
+    notificationPreferences: NotificationPreferences,
+    permissionPreferences: PermissionPreferences
 
 ) {
     val loginViewModel: InicioSesionViewModel = viewModel()
@@ -38,6 +42,7 @@ fun NavegacionApp(
     NavHost(
         navController = navController,
         startDestination = startDestination,
+
 
     ) {
         composable(Pantallas.Bienvenida.ruta) {
@@ -154,6 +159,8 @@ fun NavegacionApp(
         }
         composable(Pantallas.MiCuenta.ruta) {
             PantallaMiCuenta(
+                sessionManager = sessionManager,
+                loginViewModel = loginViewModel,
                 irACambiarUsuario = {
                     navController.navigate(Pantallas.CambiarUsuario.ruta)
                 },
@@ -175,9 +182,6 @@ fun NavegacionApp(
                     navController.navigate(Pantallas.InicioSesion.ruta) {
                         popUpTo(0)
                     }
-                },
-                irAConfirmarBorrarCuenta = {
-                    // luego lo haces
                 }
             )
         }
@@ -235,14 +239,9 @@ fun NavegacionApp(
         }
         composable(Pantallas.Notificaciones.ruta) {
             PantallaNotificaciones(
-                irAHome = {
-                    navController.navigate(Pantallas.Home.ruta) {
-                        popUpTo(Pantallas.Notificaciones.ruta) { inclusive = true }
-                    }
-                },
-                irAConfiguracion = {
-                    navController.popBackStack()
-                }
+                irAHome = { navController.navigate(Pantallas.Home.ruta) },
+                irAConfiguracion = { navController.popBackStack() },
+                notificationPreferences = notificationPreferences
             )
         }
         composable(Pantallas.Privacidad.ruta) {
@@ -254,7 +253,8 @@ fun NavegacionApp(
                 },
                 irAConfiguracion = {
                     navController.popBackStack()
-                }
+                },
+                permissionPreferences = permissionPreferences
             )
         }
 

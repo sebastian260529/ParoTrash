@@ -73,7 +73,6 @@ fun PantallaCambiarUsuario(
                 onClick = {}
             )
 
-            // ✏️ Usuario nuevo
             Formulario(
                 icon1 = Icons.Default.AccountCircle,
                 nombre = stringResource(R.string.usuario_nuevo),
@@ -83,7 +82,6 @@ fun PantallaCambiarUsuario(
                 onTextChange = { viewModel.onNuevoUsuarioChange(it) }
             )
 
-            // ✅ Confirmar cambios
             BotonCargando(
                 nombre = stringResource(R.string.confirmar_cambios_1),
                 isLoading = viewModel.isLoading,
@@ -94,7 +92,6 @@ fun PantallaCambiarUsuario(
                 }
             )
 
-            // ❌ Descartar cambios
             BotonCargando(
                 nombre = stringResource(R.string.descartar_cambios_2),
                 isLoading = false,

@@ -98,31 +98,3 @@ fun BotonConSwitch(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewBotonConSwitch() {
-    var estadoAlerta by remember { mutableStateOf(true) }
-    var estadoOscuro by remember { mutableStateOf(false) }
-
-    ParoTrashTheme() {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            BotonConSwitch(
-                texto = "Recibir alertas",
-                icon1 = Icons.Default.Info,
-                estaActivado = estadoAlerta,
-                onCheckedChange = { estadoAlerta = it }
-            )
-
-            BotonConSwitch(
-                icon1 = Icons.Default.Brightness4,
-                texto = "Modo oscuro",
-                descripcion = "Ahorra batería y descansa la vista",
-                estaActivado = estadoOscuro,
-                onCheckedChange = { estadoOscuro = it }
-            )
-        }
-    }
-}

@@ -68,6 +68,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("androidx.navigation:navigation-compose:2.8.5")
     implementation("androidx.datastore:datastore-preferences:1.1.2")
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
 
 
 

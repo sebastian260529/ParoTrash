@@ -46,7 +46,6 @@ fun BotonInformacion(
         modifier = modifier
             .fillMaxWidth()
             .height(55.dp)
-            .padding(horizontal = 5.dp)
             .clip(RoundedCornerShape(40.dp))
             .clickable { onClick() }
             .border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(40.dp))

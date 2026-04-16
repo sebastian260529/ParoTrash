@@ -23,8 +23,8 @@ import com.example.parotrash.ui.theme.ParoTrashTheme
 @Composable
 fun Cabecera(
     texto: String,
-    onBackClick: (() -> Unit)? = null, // Opcional
-    onCloseClick: (() -> Unit)? = null, // Opcional
+    onBackClick: (() -> Unit)? = null,
+    onCloseClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -42,17 +42,19 @@ fun Cabecera(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Atras",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
 
         Text(
             text = texto,
-            fontSize = 32.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = 48.dp)
         )
 
         if (onCloseClick != null) {
@@ -64,21 +66,9 @@ fun Cabecera(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Cerrar",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
-    }
-}
-
-@Composable
-@Preview (showBackground = true)
-fun PreviewCabecera() {
-    ParoTrashTheme() {
-        Cabecera(
-            texto = "Configuración",
-            onBackClick = {},
-            onCloseClick = {}
-        )
     }
 }

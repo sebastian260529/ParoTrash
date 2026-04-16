@@ -1,5 +1,8 @@
 package com.example.parotrash.ui.pantallas
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.EmojiPeople
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Warning
@@ -24,26 +26,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parotrash.R
+import com.example.parotrash.data.NotificationPreferences
 import com.example.parotrash.ui.componentes.BotonConSwitch
-
 import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.theme.ParoTrashTheme
+import com.example.parotrash.ui.viewmodel.NotificacionesViewModel
+import com.example.parotrash.ui.viewmodel.NotificacionesViewModelFactory
 
 @Composable
 fun PantallaNotificaciones(
     irAHome: () -> Unit,
-    irAConfiguracion: () -> Unit
+    irAConfiguracion: () -> Unit,
+    notificationPreferences: NotificationPreferences,
+    viewModel: NotificacionesViewModel = viewModel(
+        factory = NotificacionesViewModelFactory(notificationPreferences)
+    )
 ) {
-    var recibirAlertas by remember { mutableStateOf(true) }
-    var bloqueosViales by remember { mutableStateOf(true) }
-    var manifestaciones by remember { mutableStateOf(true) }
-    var rutasAlternativas by remember { mutableStateOf(true) }
-    var comunidad by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val recibirAlertas = viewModel.recibirAlertas
+    val bloqueosViales = viewModel.bloqueosViales
+    val manifestaciones = viewModel.manifestaciones
+    val rutasAlternativas = viewModel.rutasAlternativas
+    val comunidad = viewModel.comunidad
+
+    // Función para abrir configuración de notificaciones de la app
+    fun abrirConfiguracionNotificaciones() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+        context.startActivity(intent)
+    }
 
     Column(
         modifier = Modifier
@@ -60,11 +78,19 @@ fun PantallaNotificaciones(
 
         Spacer(modifier = Modifier.height(30.dp))
 
+        // Switch "Recibir alertas" - al desactivar abre configuración
         BotonConSwitch(
-            icon1 = Icons.Default.Info,
+            icon1 = Icons.Default.Notifications,
             texto = stringResource(R.string.recibir_alertas),
             estaActivado = recibirAlertas,
-            onCheckedChange = { recibirAlertas = it }
+            onCheckedChange = { activar ->
+                if (activar) {
+                    viewModel.actualizarRecibirAlertas(true)
+                } else {
+                    viewModel.actualizarRecibirAlertas(false)
+                    abrirConfiguracionNotificaciones()  // ← Abre configuración al desactivar
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(60.dp))
@@ -83,7 +109,7 @@ fun PantallaNotificaciones(
                 icon1 = Icons.Default.DirectionsCar,
                 texto = stringResource(R.string.bloqueos_viales_1),
                 estaActivado = bloqueosViales,
-                onCheckedChange = { bloqueosViales = it },
+                onCheckedChange = { viewModel.actualizarBloqueosViales(it) },
                 habilitado = recibirAlertas
             )
 
@@ -91,7 +117,7 @@ fun PantallaNotificaciones(
                 icon1 = Icons.Default.EmojiPeople,
                 texto = stringResource(R.string.manifestaciones_1),
                 estaActivado = manifestaciones,
-                onCheckedChange = { manifestaciones = it },
+                onCheckedChange = { viewModel.actualizarManifestaciones(it) },
                 habilitado = recibirAlertas
             )
 
@@ -99,7 +125,7 @@ fun PantallaNotificaciones(
                 icon1 = Icons.Default.Warning,
                 texto = stringResource(R.string.rutas_alternativas_1),
                 estaActivado = rutasAlternativas,
-                onCheckedChange = { rutasAlternativas = it },
+                onCheckedChange = { viewModel.actualizarRutasAlternativas(it) },
                 habilitado = recibirAlertas
             )
 
@@ -107,21 +133,9 @@ fun PantallaNotificaciones(
                 icon1 = Icons.Default.People,
                 texto = stringResource(R.string.comunidad),
                 estaActivado = comunidad,
-                onCheckedChange = { comunidad = it },
+                onCheckedChange = { viewModel.actualizarComunidad(it) },
                 habilitado = recibirAlertas
             )
-
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewPantallaNotificaciones() {
-    ParoTrashTheme {
-        PantallaNotificaciones(
-            irAHome = {},
-            irAConfiguracion = {}
-        )
     }
 }

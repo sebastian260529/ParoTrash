@@ -31,7 +31,6 @@ class CambiarUsuarioViewModel : ViewModel() {
         cargarUsuarioActual()
     }
 
-    // 🔹 Obtener usuario actual desde Firestore
     private fun cargarUsuarioActual() {
         val uid = auth.currentUser?.uid ?: return
 
@@ -39,19 +38,18 @@ class CambiarUsuarioViewModel : ViewModel() {
             .document(uid)
             .get()
             .addOnSuccessListener { doc ->
-                usuarioActual = doc.getString("usuario") ?: ""
+                usuarioActual = doc.getString("nombre") ?: ""
             }
             .addOnFailureListener {
                 error = "Error al cargar usuario"
             }
     }
 
-    // 🔹 setter
     fun onNuevoUsuarioChange(valor: String) {
         nuevoUsuario = valor
+        error = ""
     }
 
-    // 🔹 validación
     private fun validar(): Boolean {
         return when {
             nuevoUsuario.length < 3 -> {
@@ -62,7 +60,7 @@ class CambiarUsuarioViewModel : ViewModel() {
                 error = "Máximo 30 caracteres"
                 false
             }
-            nuevoUsuario == usuarioActual -> {
+            nuevoUsuario.equals(usuarioActual, ignoreCase = true) -> {
                 error = "El usuario es el mismo"
                 false
             }
@@ -73,9 +71,7 @@ class CambiarUsuarioViewModel : ViewModel() {
         }
     }
 
-    // 🔥 FUNCIÓN PRINCIPAL
     fun cambiarUsuario(onSuccess: () -> Unit) {
-
         val uid = auth.currentUser?.uid
 
         if (uid == null) {
@@ -87,22 +83,19 @@ class CambiarUsuarioViewModel : ViewModel() {
 
         isLoading = true
 
-        // 🔍 Verificar si el usuario ya existe
         db.collection("usuarios")
-            .whereEqualTo("usuario", nuevoUsuario)
+            .whereEqualTo("nombre", nuevoUsuario)
             .get()
             .addOnSuccessListener { query ->
-
                 if (!query.isEmpty) {
                     isLoading = false
                     error = "El usuario ya está en uso"
                     return@addOnSuccessListener
                 }
 
-                // 💾 Actualizar usuario
                 db.collection("usuarios")
                     .document(uid)
-                    .update("usuario", nuevoUsuario)
+                    .update("nombre", nuevoUsuario)
                     .addOnSuccessListener {
                         isLoading = false
                         exito = true

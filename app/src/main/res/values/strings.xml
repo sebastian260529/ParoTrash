@@ -6,7 +6,7 @@
     <string name="cambiar_contrase_a">Cambiar Contraseña</string>
     <string name="contrase_a_actual">Contraseña Actual</string>
     <string name="contrase_a_nueva">Contraseña Nueva</string>
-    <string name="confirmar_contrase_a_nueva">Confirmar Contraseña Nueva</string>
+    <string name="confirmar_contrase_a_nueva">Confirmar Contraseña</string>
     <string name="confirmar_cambios">Confirmar Cambios</string>
     <string name="descartar_cambios">Descartar Cambios</string>
     <string name="olvidaste_tu_contrase_a">¿Olvidaste tu contraseña?</string>
@@ -78,4 +78,14 @@
     <string name="inicia_sesi_n">Inicia Sesión</string>
     <string name="registro_exitoso">Registro Exitoso</string>
     <string name="iniciar_sesi_n_1">Iniciar Sesión</string>
+    <string name="Descripcion_check">Check</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="Advertencia">Si elimina su cuenta no podrá acceder a ella nunca más.</string>
+    <string name="Informacion">¿Desea eliminar su cuenta?</string>
+    <string name="cancelar_1">Cancelar</string>
+    <string name="verificar">Verificar</string>
+    <string name="dato">Para eliminar tu cuenta, ingresa tu contraseña actual.</string>
+    <string name="confirmar_acci_n">Confirmar acción</string>
+
 </resources>

@@ -1,3 +1,4 @@
+// PantallaMiCuenta.kt (modificada)
 package com.example.parotrash.ui.pantallas
 
 import androidx.compose.foundation.background
@@ -16,32 +17,58 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.parotrash.R
+import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.Cabecera
+import com.example.parotrash.ui.componentes.ConfirmarEliminacionDialog
 import com.example.parotrash.ui.componentes.Logo
 import com.example.parotrash.ui.theme.ParoTrashTheme
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.parotrash.R
+import com.example.parotrash.ui.viewmodel.EliminarCuentaViewModel
+import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 import com.example.parotrash.ui.viewmodel.MiCuentaViewModel
 
 @Composable
 fun PantallaMiCuenta(
     viewModel: MiCuentaViewModel = viewModel(),
+    loginViewModel: InicioSesionViewModel,
     irACambiarUsuario: () -> Unit,
     irACambiarCorreo: () -> Unit,
     irACambiarContrasena: () -> Unit,
     irAHome: () -> Unit,
     irAConfiguracion: () -> Unit,
     irAinicoSesion: () -> Unit,
-    irAConfirmarBorrarCuenta: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sessionManager: SessionManager,
 ) {
+    // Estado para mostrar el diálogo de confirmación
+    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
+    val eliminarViewModel: EliminarCuentaViewModel = viewModel()
+
+    // Mostrar el diálogo si la variable está en true
+    if (mostrarDialogoEliminar) {
+        ConfirmarEliminacionDialog(
+            viewModel = eliminarViewModel,
+            loginViewModel = loginViewModel,
+            sessionManager = sessionManager,  // ← pasar aquí también
+            onDismiss = { mostrarDialogoEliminar = false },
+            onEliminado = {
+                irAinicoSesion()
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,8 +82,7 @@ fun PantallaMiCuenta(
             onCloseClick = irAHome
         )
 
-        // TODO: Quitar logo, no se como poner el espcacio de la imagen
-        Logo(modifier.size(160.dp))
+        Logo(modifier = Modifier.size(160.dp))
 
         Spacer(modifier = Modifier.height(60.dp))
 
@@ -67,7 +93,6 @@ fun PantallaMiCuenta(
             BotonInformacion(
                 icon1 = Icons.Default.AccountCircle,
                 texto = stringResource(R.string.nombre_de_usuario),
-                // TODO: Falta poner los valores obtenidos del firabase
                 valorFirebase = viewModel.usuario,
                 onClick = irACambiarUsuario
             )
@@ -75,7 +100,6 @@ fun PantallaMiCuenta(
             BotonInformacion(
                 icon1 = Icons.Default.Email,
                 texto = stringResource(R.string.correo_electronico),
-                // TODO: Falta poner los valores obtenidos del firabase
                 valorFirebase = viewModel.correo,
                 onClick = irACambiarCorreo
             )
@@ -95,26 +119,8 @@ fun PantallaMiCuenta(
 
             BotonCargando(
                 isLoading = false,
-                onClick = irAConfirmarBorrarCuenta,
+                onClick = { mostrarDialogoEliminar = true },
                 nombre = stringResource(R.string.eliminar_cuenta)
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewPantallaMiCuenta() {
-    ParoTrashTheme {
-        Column {
-            PantallaMiCuenta(
-                irACambiarUsuario = {},
-                irACambiarCorreo = {},
-                irACambiarContrasena = {},
-                irAHome = {},
-                irAConfiguracion = {},
-                irAinicoSesion = {},
-                irAConfirmarBorrarCuenta = {}
             )
         }
     }

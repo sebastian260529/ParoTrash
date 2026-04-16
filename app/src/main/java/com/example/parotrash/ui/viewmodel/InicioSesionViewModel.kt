@@ -34,6 +34,15 @@ class InicioSesionViewModel : ViewModel() {
 
     var loginExitoso by mutableStateOf(false)
 
+    fun resetearEstado() {
+        correo = ""
+        contraseña = ""
+        cargando = false
+        errorCorreo = null
+        errorContraseña = null
+        errorGeneral = null
+        loginExitoso = false
+    }
     fun actualizarCorreo(nuevoCorreo: String) {
         correo = nuevoCorreo
         errorGeneral = null
