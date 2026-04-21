@@ -93,5 +93,10 @@
     <string name="Esperando_permiso">Esperando permiso...</string>
     <string name="continuar_sin_ubicacion">Continuar sin ubicación</string>
     <string name="mi_ubicaci_n">Mi Ubicación</string>
+    <string name="cono">Cono</string>
+    <string name="iconalertas">Alertas</string>
+    <string name="iconbus">Bus</string>
+    <string name="iconchoque">Choque</string>
+    <string name="iconmanifestacion">Manifestación</string>
 
 </resources>

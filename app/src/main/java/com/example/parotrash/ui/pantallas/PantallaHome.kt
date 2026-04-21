@@ -25,6 +25,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.example.parotrash.ui.componentes.SelectorIconos
 import com.example.parotrash.ui.viewmodel.HomeViewModel
 
 @Composable
@@ -114,5 +115,14 @@ fun PantallaHome(
                 contentDescription = stringResource(R.string.cerrar_sesi_n)
             )
         }
+
+        SelectorIconos(
+            onIconoSeleccionado = { icono ->
+                // Por ahora no hace nada
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomCenter)
+        )
     }
 }
