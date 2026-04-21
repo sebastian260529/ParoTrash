@@ -1,5 +1,6 @@
 package com.example.parotrash
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,13 +13,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -28,6 +29,8 @@ import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.navegacion.NavegacionApp
 import com.example.parotrash.ui.navegacion.Pantallas
 import com.example.parotrash.ui.theme.ParoTrashTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -49,23 +52,34 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ParotrashApp(
     sessionManager: SessionManager,
     notificationPreferences: NotificationPreferences,
     permissionPreferences: PermissionPreferences
 ) {
-    val isLoggedIn by sessionManager.isLoggedIn.collectAsState(initial = false)
-    val isFirstTime by sessionManager.isFirstTime.collectAsState(initial = true)
+    val context = LocalContext.current
+
+    val locationPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    )
 
     var startDestination by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         delay(100)
-        startDestination = when {
-            isFirstTime -> Pantallas.Bienvenida.ruta
-            isLoggedIn -> Pantallas.Home.ruta
-            else -> Pantallas.InicioSesion.ruta
+        if (!locationPermissions.allPermissionsGranted) {
+            locationPermissions.launchMultiplePermissionRequest()
+        }
+    }
+
+    LaunchedEffect(locationPermissions.allPermissionsGranted) {
+        if (locationPermissions.allPermissionsGranted) {
+            startDestination = Pantallas.Bienvenida.ruta
         }
     }
 
@@ -83,9 +97,10 @@ fun ParotrashApp(
             )
         }
     } else {
+        val destination = startDestination ?: Pantallas.Bienvenida.ruta
         NavegacionApp(
             navController = rememberNavController(),
-            startDestination = startDestination!!,
+            startDestination = destination,
             sessionManager = sessionManager,
             notificationPreferences = notificationPreferences,
             permissionPreferences = permissionPreferences

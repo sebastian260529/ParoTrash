@@ -87,5 +87,11 @@
     <string name="verificar">Verificar</string>
     <string name="dato">Para eliminar tu cuenta, ingresa tu contraseña actual.</string>
     <string name="confirmar_acci_n">Confirmar acción</string>
+    <string name="permiso_de_ubicaci_n">Permiso de Ubicación</string>
+    <string name="descripcion_permiso_ubicacion">Para mostrar tu ubicación en el mapa, necesitamos acceso a tu ubicación.</string>
+    <string name="otorgar_permiso">Otorgar Permiso</string>
+    <string name="Esperando_permiso">Esperando permiso...</string>
+    <string name="continuar_sin_ubicacion">Continuar sin ubicación</string>
+    <string name="mi_ubicaci_n">Mi Ubicación</string>
 
 </resources>

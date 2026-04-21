@@ -1,6 +1,8 @@
 package com.example.parotrash.ui.navegacion
 
+import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,6 +24,8 @@ import com.example.parotrash.ui.pantallas.PantallaPermisos
 import com.example.parotrash.ui.pantallas.PantallaRecuperarContraseña
 import com.example.parotrash.ui.pantallas.PantallaRegistrarse
 import com.example.parotrash.ui.pantallas.PantallaRegistroExitoso
+import com.example.parotrash.ui.viewmodel.HomeViewModel
+import com.example.parotrash.ui.viewmodel.HomeViewModelFactory
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 import com.example.parotrash.ui.viewmodel.RecuperarViewModel
 import com.example.parotrash.ui.viewmodel.RegistroViewModel
@@ -38,6 +42,8 @@ fun NavegacionApp(
     val loginViewModel: InicioSesionViewModel = viewModel()
     val registroViewModel: RegistroViewModel = viewModel()
     val recuperarViewModel: RecuperarViewModel = viewModel()
+    val homeViewModelFactory = HomeViewModelFactory(LocalContext.current.applicationContext as Application)
+    val homeViewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
 
     NavHost(
         navController = navController,
@@ -129,7 +135,7 @@ fun NavegacionApp(
 
         composable(Pantallas.Home.ruta) {
             PantallaHome(
-                viewModel = loginViewModel,
+                homeViewModel = homeViewModel,
                 irACerrarSesion = {
                     navController.navigate(Pantallas.InicioSesion.ruta) {
                         popUpTo(Pantallas.Home.ruta) {

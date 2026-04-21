@@ -86,7 +86,6 @@ fun PantallaCambiarContrasena(
                 usuario = viewModel.confirmarContrasena,
                 onTextChange = { viewModel.onConfirmarContrasenaChange(it) }
             )
-
             BotonCargando(
                 nombre = stringResource(R.string.confirmar_cambios),
                 isLoading = viewModel.isLoading,
