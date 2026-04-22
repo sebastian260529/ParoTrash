@@ -25,6 +25,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _ubicacion = MutableStateFlow<Location?>(null)
     val ubicacion: StateFlow<Location?> = _ubicacion
 
+    private val _reportes = MutableStateFlow<List<Reporte>>(emptyList())
+    val reportes: StateFlow<List<Reporte>> = _reportes
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -42,6 +45,46 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     var errorReporte by mutableStateOf<String?>(null)
         private set
+
+    init {
+        escucharReportes()
+    }
+
+    private fun escucharReportes() {
+        firestore.collection("reportes")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    errorReporte = "❌ Error al cargar reportes: ${e.message}"
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    try {
+                        val listaReportes = snapshot.documents.mapNotNull { doc ->
+                            doc.toObject(Reporte::class.java)?.copy(id = doc.id)
+                        }
+                        _reportes.value = listaReportes
+                    } catch (ex: Exception) {
+                        errorReporte = "❌ Error al procesar datos: ${ex.message}"
+                    }
+                }
+            }
+    }
+
+    fun eliminarReporte(reporteId: String) {
+        if (reporteId.isEmpty()) return
+
+        firestore.collection("reportes")
+            .document(reporteId)
+            .delete()
+            .addOnFailureListener { error ->
+                errorReporte = "❌ No se pudo eliminar el reporte: ${error.message}"
+            }
+    }
+
+    fun limpiarError() {
+        errorReporte = null
+    }
 
     fun obtenerUbicacion() {
         viewModelScope.launch {
