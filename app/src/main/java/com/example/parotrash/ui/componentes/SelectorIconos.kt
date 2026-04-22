@@ -4,14 +4,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -42,9 +44,6 @@ fun SelectorIconos(
     modifier: Modifier = Modifier
 ) {
     var expandido by remember { mutableStateOf(false) }
-    var iconoSeleccionado by remember { mutableStateOf("cono") }
-
-    val contexto = LocalContext.current
 
     val iconoPrincipal = IconoItem(
         drawableRes = R.drawable.cono,
@@ -75,16 +74,10 @@ fun SelectorIconos(
         )
     )
 
-    val iconoActual = if (iconoSeleccionado == "cono") {
-        iconoPrincipal
-    } else {
-        iconosLista.find { it.clave == iconoSeleccionado } ?: iconoPrincipal
-    }
-
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AnimatedVisibility(
             visible = expandido,
@@ -92,62 +85,53 @@ fun SelectorIconos(
             exit = shrinkVertically()
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalAlignment = Alignment.End
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 iconosLista.forEach { icono ->
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
+                            .width(64.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.White.copy(alpha = 0.8f))
                             .clickable {
-                                iconoSeleccionado = icono.clave
                                 onIconoSeleccionado(icono.clave)
                                 expandido = false
                             }
-                            .padding(8.dp)
+                            .padding(bottom = 4.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = icono.drawableRes),
                             contentDescription = stringResource(id = icono.stringRes),
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(56.dp),
                             tint = Color.Unspecified
                         )
                         Text(
                             text = stringResource(id = icono.stringRes),
                             fontSize = 10.sp,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 2.dp),
+                            lineHeight = 10.sp
                         )
                     }
                 }
             }
         }
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.White.copy(alpha = 0.8f))
-                .clickable {
-                    if (expandido) {
-                        expandido = false
-                    } else {
-                        expandido = true
-                    }
-                }
-                .padding(8.dp)
+                .size(70.dp)
+                .border(1.5.dp, Color.Red, CircleShape)
+                .clip(CircleShape)
+                .clickable { expandido = !expandido }
         ) {
             Icon(
-                painter = painterResource(id = iconoActual.drawableRes),
-                contentDescription = stringResource(id = iconoActual.stringRes),
-                modifier = Modifier.size(40.dp),
+                painter = painterResource(id = iconoPrincipal.drawableRes),
+                contentDescription = stringResource(id = iconoPrincipal.stringRes),
+                modifier = Modifier.size(50.dp),
                 tint = Color.Unspecified
-            )
-            Text(
-                text = stringResource(id = iconoActual.stringRes),
-                fontSize = 10.sp,
-                textAlign = TextAlign.Center
             )
         }
     }

@@ -1,32 +1,41 @@
 package com.example.parotrash.ui.pantallas
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
+import com.example.parotrash.ui.componentes.SelectorIconos
+import com.example.parotrash.ui.viewmodel.HomeViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.example.parotrash.ui.componentes.SelectorIconos
-import com.example.parotrash.ui.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun PantallaHome(
@@ -38,6 +47,7 @@ fun PantallaHome(
     val context = LocalContext.current
     val ubicacion by homeViewModel.ubicacion.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState()
+    val scope = rememberCoroutineScope()
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -69,8 +79,8 @@ fun PantallaHome(
 
     val mapUiSettings = remember {
         MapUiSettings(
-            zoomControlsEnabled = true,
-            myLocationButtonEnabled = true
+            zoomControlsEnabled = false,
+            myLocationButtonEnabled = false
         )
     }
 
@@ -88,41 +98,63 @@ fun PantallaHome(
             uiSettings = mapUiSettings
         )
 
-        FloatingActionButton(
-            onClick = irAConfiguracion,
+        // Botón de Menú (Superior Izquierda) - Ajustado el padding top
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.BottomStart)
+                .padding(top = 40.dp, start = 16.dp)
+                .align(Alignment.TopStart)
+                .size(60.dp)
+                .border(2.dp, Color.Red, CircleShape)
+                .clip(CircleShape)
+                .background(Color.Transparent)
+                .clickable { irAConfiguracion() }
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = stringResource(R.string.configuraci_n_1)
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menú",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(35.dp)
             )
         }
 
-        FloatingActionButton(
-            onClick = {
-                homeViewModel.cerrarSesion(sessionManager) {
-                    irACerrarSesion()
+        // Botón de Ubicarme (Superior Derecha) - Ajustado el padding top
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(top = 40.dp, end = 16.dp)
+                .align(Alignment.TopEnd)
+                .size(60.dp)
+                .background(Color.White, CircleShape)
+                .border(1.dp, Color.Gray.copy(alpha = 0.5f), CircleShape)
+                .clip(CircleShape)
+                .clickable {
+                    scope.launch {
+                        ubicacion?.let {
+                            cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                                LatLng(it.latitude, it.longitude),
+                                17f
+                            )
+                        }
+                    }
                 }
-            },
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.BottomEnd)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = stringResource(R.string.cerrar_sesi_n)
+                imageVector = Icons.Default.MyLocation,
+                contentDescription = "Ubicarme",
+                modifier = Modifier.size(35.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 
+        // Selector de Iconos (Cono) - Movido a la derecha
         SelectorIconos(
             onIconoSeleccionado = { icono ->
                 // Por ahora no hace nada
             },
             modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.BottomCenter)
+                .padding(end = 16.dp, bottom = 32.dp)
+                .align(Alignment.BottomEnd)
         )
     }
 }
