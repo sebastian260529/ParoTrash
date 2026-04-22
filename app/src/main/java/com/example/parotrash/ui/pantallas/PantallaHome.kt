@@ -2,6 +2,7 @@ package com.example.parotrash.ui.pantallas
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +19,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +37,8 @@ import com.example.parotrash.ui.componentes.DialogoReporte
 import com.example.parotrash.ui.componentes.SelectorIconos
 import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.HomeViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -42,8 +47,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,99 +65,82 @@ fun PantallaHome(
     val permisoConcedido by homeViewModel.permisoConcedido.collectAsStateWithLifecycle()
     val reportes by homeViewModel.reportes.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    
-    // Estado para controlar qué diálogo mostrar
+
     var reporteSeleccionado by remember { mutableStateOf<String?>(null) }
-    
-    // Detectamos si el sistema está en modo oscuro
     val esModoOscuro = isSystemInDarkTheme()
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(
-            LatLng(4.6097, -74.0817),
-            14f
-        )
+        position = CameraPosition.fromLatLngZoom(LatLng(4.6097, -74.0817), 14f)
     }
 
-    // Nivel de zoom actual
     val zoomActual = cameraPositionState.position.zoom
-    // Umbral para mostrar/ocultar iconos (puedes ajustar este número)
     val umbralZoom = 13f
 
-    // Observador de ciclo de vida para actualizar permisos y ubicación al volver a la app
+    // OPTIMIZACIÓN Y FIX: Estado para iconos cacheados
+    var iconosCacheados by remember { mutableStateOf<Map<String, BitmapDescriptor>?>(null) }
+
+    // Inicialización segura de iconos (Evita el crash de IBitmapDescriptorFactory)
+    LaunchedEffect(Unit) {
+        try {
+            val escala = 100
+            fun crearIcono(resId: Int): BitmapDescriptor {
+                val bitmap = BitmapFactory.decodeResource(context.resources, resId)
+                val rescalado = Bitmap.createScaledBitmap(bitmap, escala, escala, false)
+                return BitmapDescriptorFactory.fromBitmap(rescalado)
+            }
+            iconosCacheados = mapOf(
+                "Alerta" to crearIcono(R.drawable.iconalertas),
+                "Bus Varado" to crearIcono(R.drawable.iconbus),
+                "Accidente" to crearIcono(R.drawable.iconchoque),
+                "Manifestación" to crearIcono(R.drawable.iconmanifestacion),
+                "Default" to crearIcono(R.drawable.iconalertas)
+            )
+        } catch (e: Exception) {
+            Log.e("MapsError", "Error al crear iconos: ${e.message}")
+        }
+    }
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 homeViewModel.actualizarPermisos()
-                // Si ya tenemos permisos pero no ubicación, intentamos obtenerla
                 if (homeViewModel.tienePermiso() && homeViewModel.ubicacion.value == null) {
                     homeViewModel.obtenerUbicacion()
                 }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // Al iniciar, si tenemos permisos, intentamos obtener la ubicación
     LaunchedEffect(permisoConcedido) {
-        if (permisoConcedido) {
-            homeViewModel.obtenerUbicacion()
-        }
+        if (permisoConcedido) homeViewModel.obtenerUbicacion()
     }
 
-    // Efecto para centrar la cámara cuando la ubicación cambia
     LaunchedEffect(ubicacion) {
-        if (cameraPositionState.position.zoom < 10f) { // Solo centrar si está muy lejos
-             ubicacion?.let { location ->
+        if (cameraPositionState.position.zoom < 10f) {
+            ubicacion?.let {
                 cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                    LatLng(location.latitude, location.longitude),
-                    17f
+                    LatLng(it.latitude, it.longitude), 17f
                 )
             }
         }
     }
 
-    // Configuramos las propiedades del mapa con el estilo automático
     val mapProperties = remember(esModoOscuro, permisoConcedido) {
         MapProperties(
             isMyLocationEnabled = permisoConcedido,
             mapStyleOptions = if (esModoOscuro) {
-                try {
-                    MapStyleOptions.loadRawResourceStyle(context, R.raw.mapa_oscuro)
-                } catch (e: Exception) {
-                    null
-                }
-            } else {
-                null
-            }
+                try { MapStyleOptions.loadRawResourceStyle(context, R.raw.mapa_oscuro) } catch (e: Exception) { null }
+            } else null
         )
     }
 
-    val mapUiSettings = remember {
-        MapUiSettings(
-            zoomControlsEnabled = false,
-            myLocationButtonEnabled = false
-        )
-    }
-
-    // Función para redimensionar iconos
-    val crearIconoPequeno = remember(context) {
-        { resId: Int ->
-            val bitmap = BitmapFactory.decodeResource(context.resources, resId)
-            val escala = 100 // Tamaño en píxeles (puedes ajustarlo)
-            val bitmapRedimensionado = Bitmap.createScaledBitmap(bitmap, escala, escala, false)
-            BitmapDescriptorFactory.fromBitmap(bitmapRedimensionado)
-        }
-    }
+    val mapUiSettings = remember { MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
 
         GoogleMap(
@@ -161,29 +149,26 @@ fun PantallaHome(
             properties = mapProperties,
             uiSettings = mapUiSettings
         ) {
-            // Solo mostramos los marcadores si el zoom es suficiente
-            if (zoomActual >= umbralZoom) {
+            // Solo dibujar si los iconos están cargados y el zoom es suficiente
+            val iconos = iconosCacheados
+            if (iconos != null && zoomActual >= umbralZoom) {
                 reportes.forEach { reporte ->
-                    val posicion = LatLng(reporte.ubicacion[0], reporte.ubicacion[1])
-                    val iconoRes = when (reporte.tipo) {
-                        "Alerta" -> R.drawable.iconalertas
-                        "Bus Varado" -> R.drawable.iconbus
-                        "Accidente" -> R.drawable.iconchoque
-                        "Manifestación" -> R.drawable.iconmanifestacion
-                        else -> R.drawable.iconalertas
+                    val pos = LatLng(reporte.ubicacion[0], reporte.ubicacion[1])
+                    val icono = iconos[reporte.tipo] ?: iconos["Default"]
+
+                    key(reporte.id) {
+                        Marker(
+                            state = rememberMarkerState(position = pos),
+                            title = reporte.tipo,
+                            snippet = reporte.descripcion,
+                            icon = icono
+                        )
                     }
-                    
-                    Marker(
-                        state = MarkerState(position = posicion),
-                        title = reporte.tipo,
-                        snippet = reporte.descripcion,
-                        icon = crearIconoPequeno(iconoRes)
-                    )
                 }
             }
         }
 
-        // Botón de Menú (Superior Izquierda)
+        // Botón Menú
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -195,15 +180,10 @@ fun PantallaHome(
                 .background(Color.Transparent)
                 .clickable { irAConfiguracion() }
         ) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menú",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(35.dp)
-            )
+            Icon(Icons.Default.Menu, "Menú", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(35.dp))
         }
 
-        // Botón de Ubicarme (Superior Derecha)
+        // Botón Ubicarme
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -211,76 +191,32 @@ fun PantallaHome(
                 .align(Alignment.TopEnd)
                 .size(60.dp)
                 .background(ParoTrashTheme.customColors.mapElementBackground, CircleShape)
-                .border(1.dp, Color.Gray.copy(alpha = 0.5f), CircleShape)
                 .clip(CircleShape)
                 .clickable {
                     homeViewModel.obtenerUbicacion()
                     ubicacion?.let {
                         scope.launch {
-                            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                                LatLng(it.latitude, it.longitude),
-                                17f
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 17f)
                             )
                         }
                     }
                 }
         ) {
-            Icon(
-                imageVector = Icons.Default.MyLocation,
-                contentDescription = "Ubicarme",
-                modifier = Modifier.size(35.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Icon(Icons.Default.MyLocation, "Ubicarme", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(35.dp))
         }
 
-        // Selector de Iconos (Cono) - A la derecha
         SelectorIconos(
-            onIconoSeleccionado = { icono ->
-                reporteSeleccionado = icono
-            },
-            modifier = Modifier
-                .padding(end = 16.dp, bottom = 32.dp)
-                .align(Alignment.BottomEnd)
+            onIconoSeleccionado = { reporteSeleccionado = it },
+            modifier = Modifier.padding(end = 16.dp, bottom = 32.dp).align(Alignment.BottomEnd)
         )
 
-        // Lógica de Diálogos de Reporte
+        // Diálogos de Reporte
         when (reporteSeleccionado) {
-            "iconalertas" -> DialogoReporte(
-                titulo = "¿Desea reportar una alerta?",
-                iconoRes = R.drawable.iconalertas,
-                onDescartar = { reporteSeleccionado = null },
-                onAceptar = { 
-                    homeViewModel.reportarRapido("Alerta")
-                    reporteSeleccionado = null 
-                }
-            )
-            "iconbus" -> DialogoReporte(
-                titulo = "¿Desea reportar un bus varado?",
-                iconoRes = R.drawable.iconbus,
-                onDescartar = { reporteSeleccionado = null },
-                onAceptar = { 
-                    homeViewModel.reportarRapido("Bus Varado")
-                    reporteSeleccionado = null 
-                }
-            )
-            "iconchoque" -> DialogoReporte(
-                titulo = "¿Desea reportar un accidente?",
-                iconoRes = R.drawable.iconchoque,
-                onDescartar = { reporteSeleccionado = null },
-                onAceptar = { 
-                    homeViewModel.reportarRapido("Accidente")
-                    reporteSeleccionado = null 
-                }
-            )
-            "iconmanifestacion" -> DialogoReporte(
-                titulo = "¿Desea reportar una manifestación?",
-                iconoRes = R.drawable.iconmanifestacion,
-                onDescartar = { reporteSeleccionado = null },
-                onAceptar = { 
-                    homeViewModel.reportarRapido("Manifestación")
-                    reporteSeleccionado = null 
-                }
-            )
+            "iconalertas" -> DialogoReporte("¿Desea reportar una alerta?", R.drawable.iconalertas, { reporteSeleccionado = null }) { homeViewModel.reportarRapido("Alerta"); reporteSeleccionado = null }
+            "iconbus" -> DialogoReporte("¿Desea reportar un bus varado?", R.drawable.iconbus, { reporteSeleccionado = null }) { homeViewModel.reportarRapido("Bus Varado"); reporteSeleccionado = null }
+            "iconchoque" -> DialogoReporte("¿Desea reportar un accidente?", R.drawable.iconchoque, { reporteSeleccionado = null }) { homeViewModel.reportarRapido("Accidente"); reporteSeleccionado = null }
+            "iconmanifestacion" -> DialogoReporte("¿Desea reportar una manifestación?", R.drawable.iconmanifestacion, { reporteSeleccionado = null }) { homeViewModel.reportarRapido("Manifestación"); reporteSeleccionado = null }
         }
     }
 }
