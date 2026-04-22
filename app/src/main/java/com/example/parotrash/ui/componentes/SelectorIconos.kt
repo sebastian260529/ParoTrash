@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parotrash.R
+import com.example.parotrash.ui.theme.ParoTrashTheme
 
 data class IconoItem(
     val drawableRes: Int,
@@ -94,7 +96,7 @@ fun SelectorIconos(
                         modifier = Modifier
                             .width(64.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color.White.copy(alpha = 0.8f))
+                            .background(ParoTrashTheme.customColors.mapElementBackground.copy(alpha = 0.9f))
                             .clickable {
                                 onIconoSeleccionado(icono.clave)
                                 expandido = false
@@ -109,6 +111,7 @@ fun SelectorIconos(
                         )
                         Text(
                             text = stringResource(id = icono.stringRes),
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 10.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(horizontal = 2.dp),

@@ -11,7 +11,11 @@ val GrisDetalle = Color(0xFF666666)
 val FondoLight = Color(0xFFFFFFFF)
 val TextoPrincipalLight = Color(0xFF000000)
 val TextoBotonesLight = Color(0xFFFFFFFF)
-val SuperficieLight = Color(0xFFF5F5F5) // Un gris muy tenue para tarjetas
+val SuperficieLight = Color(0xFFF5F5F5)
+
+// Colores especificos para Selectorlconos
+val MapElementBackgroundLight = Color(0xFFFFFFFF)
+val MapElementBackgroundDark = Color(0xFF242F3E)
 
 // Modo Dark
 val FondoBlack = Color(0xFF000000)

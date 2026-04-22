@@ -8,8 +8,18 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+
+@Immutable
+data class CustomColors(
+    val mapElementBackground: Color = Color.Unspecified
+)
+
+val LocalCustomColors = staticCompositionLocalOf { CustomColors() }
 
 private val DarkColorScheme = darkColorScheme(
     primary = Rojo,
@@ -52,9 +62,22 @@ fun ParoTrashTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+    val customColors = CustomColors(
+        mapElementBackground = if (darkTheme) MapElementBackgroundDark else MapElementBackgroundLight
     )
+
+    CompositionLocalProvider(LocalCustomColors provides customColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
+}
+
+// Objeto para acceder fácilmente a los colores personalizados
+object ParoTrashTheme {
+    val customColors: CustomColors
+        @Composable
+        get() = LocalCustomColors.current
 }

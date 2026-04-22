@@ -3,6 +3,7 @@ package com.example.parotrash.ui.pantallas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,11 +27,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.SelectorIconos
+import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.HomeViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -48,6 +52,9 @@ fun PantallaHome(
     val ubicacion by homeViewModel.ubicacion.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState()
     val scope = rememberCoroutineScope()
+    
+    // Detectamos si el sistema está en modo oscuro
+    val esModoOscuro = isSystemInDarkTheme()
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -71,9 +78,19 @@ fun PantallaHome(
         }
     }
 
-    val mapProperties = remember {
+    // Configuramos las propiedades del mapa con el estilo automático
+    val mapProperties = remember(esModoOscuro) {
         MapProperties(
-            isMyLocationEnabled = homeViewModel.tienePermiso()
+            isMyLocationEnabled = homeViewModel.tienePermiso(),
+            mapStyleOptions = if (esModoOscuro) {
+                try {
+                    MapStyleOptions.loadRawResourceStyle(context, R.raw.mapa_oscuro)
+                } catch (e: Exception) {
+                    null
+                }
+            } else {
+                null
+            }
         )
     }
 
@@ -98,14 +115,14 @@ fun PantallaHome(
             uiSettings = mapUiSettings
         )
 
-        // Botón de Menú (Superior Izquierda) - Ajustado el padding top
+        // Botón de Menú (Superior Izquierda)
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .padding(top = 40.dp, start = 16.dp)
                 .align(Alignment.TopStart)
                 .size(60.dp)
-                .border(2.dp, Color.Red, CircleShape)
+                .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
                 .clip(CircleShape)
                 .background(Color.Transparent)
                 .clickable { irAConfiguracion() }
@@ -118,14 +135,14 @@ fun PantallaHome(
             )
         }
 
-        // Botón de Ubicarme (Superior Derecha) - Ajustado el padding top
+        // Botón de Ubicarme (Superior Derecha)
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .padding(top = 40.dp, end = 16.dp)
                 .align(Alignment.TopEnd)
                 .size(60.dp)
-                .background(Color.White, CircleShape)
+                .background(ParoTrashTheme.customColors.mapElementBackground, CircleShape)
                 .border(1.dp, Color.Gray.copy(alpha = 0.5f), CircleShape)
                 .clip(CircleShape)
                 .clickable {
@@ -147,7 +164,7 @@ fun PantallaHome(
             )
         }
 
-        // Selector de Iconos (Cono) - Movido a la derecha
+        // Selector de Iconos (Cono) - A la derecha
         SelectorIconos(
             onIconoSeleccionado = { icono ->
                 // Por ahora no hace nada
