@@ -1,5 +1,7 @@
 package com.example.parotrash.ui.pantallas
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,19 +23,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.ui.componentes.DialogoReporte
 import com.example.parotrash.ui.componentes.SelectorIconos
 import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.HomeViewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
@@ -45,8 +54,11 @@ fun PantallaHome(
     sessionManager: SessionManager
 ) {
     val context = LocalContext.current
-    val ubicacion by homeViewModel.ubicacion.collectAsState()
-    val isLoading by homeViewModel.isLoading.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val ubicacion by homeViewModel.ubicacion.collectAsStateWithLifecycle()
+    val isLoading by homeViewModel.isLoading.collectAsStateWithLifecycle()
+    val permisoConcedido by homeViewModel.permisoConcedido.collectAsStateWithLifecycle()
+    val reportes by homeViewModel.reportes.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     
     // Estado para controlar qué diálogo mostrar
@@ -62,25 +74,51 @@ fun PantallaHome(
         )
     }
 
-    LaunchedEffect(Unit) {
-        if (homeViewModel.tienePermiso()) {
+    // Nivel de zoom actual
+    val zoomActual = cameraPositionState.position.zoom
+    // Umbral para mostrar/ocultar iconos (puedes ajustar este número)
+    val umbralZoom = 13f
+
+    // Observador de ciclo de vida para actualizar permisos y ubicación al volver a la app
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                homeViewModel.actualizarPermisos()
+                // Si ya tenemos permisos pero no ubicación, intentamos obtenerla
+                if (homeViewModel.tienePermiso() && homeViewModel.ubicacion.value == null) {
+                    homeViewModel.obtenerUbicacion()
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    // Al iniciar, si tenemos permisos, intentamos obtener la ubicación
+    LaunchedEffect(permisoConcedido) {
+        if (permisoConcedido) {
             homeViewModel.obtenerUbicacion()
         }
     }
 
+    // Efecto para centrar la cámara cuando la ubicación cambia
     LaunchedEffect(ubicacion) {
-        ubicacion?.let { location ->
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(location.latitude, location.longitude),
-                17f
-            )
+        if (cameraPositionState.position.zoom < 10f) { // Solo centrar si está muy lejos
+             ubicacion?.let { location ->
+                cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                    LatLng(location.latitude, location.longitude),
+                    17f
+                )
+            }
         }
     }
 
     // Configuramos las propiedades del mapa con el estilo automático
-    val mapProperties = remember(esModoOscuro) {
+    val mapProperties = remember(esModoOscuro, permisoConcedido) {
         MapProperties(
-            isMyLocationEnabled = homeViewModel.tienePermiso(),
+            isMyLocationEnabled = permisoConcedido,
             mapStyleOptions = if (esModoOscuro) {
                 try {
                     MapStyleOptions.loadRawResourceStyle(context, R.raw.mapa_oscuro)
@@ -100,6 +138,16 @@ fun PantallaHome(
         )
     }
 
+    // Función para redimensionar iconos
+    val crearIconoPequeno = remember(context) {
+        { resId: Int ->
+            val bitmap = BitmapFactory.decodeResource(context.resources, resId)
+            val escala = 100 // Tamaño en píxeles (puedes ajustarlo)
+            val bitmapRedimensionado = Bitmap.createScaledBitmap(bitmap, escala, escala, false)
+            BitmapDescriptorFactory.fromBitmap(bitmapRedimensionado)
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         if (isLoading) {
             CircularProgressIndicator(
@@ -112,7 +160,28 @@ fun PantallaHome(
             cameraPositionState = cameraPositionState,
             properties = mapProperties,
             uiSettings = mapUiSettings
-        )
+        ) {
+            // Solo mostramos los marcadores si el zoom es suficiente
+            if (zoomActual >= umbralZoom) {
+                reportes.forEach { reporte ->
+                    val posicion = LatLng(reporte.ubicacion[0], reporte.ubicacion[1])
+                    val iconoRes = when (reporte.tipo) {
+                        "Alerta" -> R.drawable.iconalertas
+                        "Bus Varado" -> R.drawable.iconbus
+                        "Accidente" -> R.drawable.iconchoque
+                        "Manifestación" -> R.drawable.iconmanifestacion
+                        else -> R.drawable.iconalertas
+                    }
+                    
+                    Marker(
+                        state = MarkerState(position = posicion),
+                        title = reporte.tipo,
+                        snippet = reporte.descripcion,
+                        icon = crearIconoPequeno(iconoRes)
+                    )
+                }
+            }
+        }
 
         // Botón de Menú (Superior Izquierda)
         Box(
@@ -145,8 +214,9 @@ fun PantallaHome(
                 .border(1.dp, Color.Gray.copy(alpha = 0.5f), CircleShape)
                 .clip(CircleShape)
                 .clickable {
-                    scope.launch {
-                        ubicacion?.let {
+                    homeViewModel.obtenerUbicacion()
+                    ubicacion?.let {
+                        scope.launch {
                             cameraPositionState.position = CameraPosition.fromLatLngZoom(
                                 LatLng(it.latitude, it.longitude),
                                 17f

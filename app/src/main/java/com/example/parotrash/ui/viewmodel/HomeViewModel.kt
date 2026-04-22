@@ -2,6 +2,7 @@ package com.example.parotrash.ui.viewmodel
 
 import android.app.Application
 import android.location.Location
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +13,7 @@ import com.example.parotrash.data.SessionManager
 import com.example.parotrash.modelos.Reporte
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -28,6 +30,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _permisoConcedido = MutableStateFlow(locationManager.hasLocationPermission())
+    val permisoConcedido: StateFlow<Boolean> = _permisoConcedido
+
+    private val _reportes = MutableStateFlow<List<Reporte>>(emptyList())
+    val reportes: StateFlow<List<Reporte>> = _reportes
+
     var descripcion by mutableStateOf("")
         private set
 
@@ -43,14 +51,62 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var errorReporte by mutableStateOf<String?>(null)
         private set
 
+    init {
+        escucharReportes()
+    }
+
+    private fun escucharReportes() {
+        firestore.collection("reportes")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("HomeViewModel", "Error en SnapshotListener: ${error.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val listaValida = mutableListOf<Reporte>()
+                    for (doc in snapshot.documents) {
+                        try {
+                            // Intentamos convertir el documento al objeto Reporte
+                            val reporte = doc.toObject(Reporte::class.java)?.copy(id = doc.id)
+                            if (reporte != null) {
+                                listaValida.add(reporte)
+                            }
+                        } catch (e: Exception) {
+                            // Si falla un solo reporte, lo ignoramos y seguimos con los demás
+                            Log.e("HomeViewModel", "Error al procesar reporte ${doc.id}: ${e.message}")
+                        }
+                    }
+                    _reportes.value = listaValida
+                }
+            }
+    }
+
+    fun actualizarPermisos() {
+        _permisoConcedido.value = locationManager.hasLocationPermission()
+    }
+
     fun obtenerUbicacion() {
         viewModelScope.launch {
+            actualizarPermisos()
+            if (!_permisoConcedido.value) return@launch
+
             _isLoading.value = true
             try {
-                val location = locationManager.getCurrentLocation()
+                // Intentamos obtener la ubicación actual. 
+                // Si el GPS se acaba de activar, puede tardar unos segundos en estar disponible.
+                var location = locationManager.getCurrentLocation()
+                
+                if (location == null) {
+                    // Si es null, esperamos un poco y reintentamos, por si el hardware está iniciando.
+                    delay(1500)
+                    location = locationManager.getCurrentLocation()
+                }
+
                 if (location != null) {
                     _ubicacion.value = location
                 } else {
+                    // Como último recurso, usamos la última ubicación conocida.
                     val lastLocation = locationManager.getLastKnownLocation()
                     _ubicacion.value = lastLocation
                 }
