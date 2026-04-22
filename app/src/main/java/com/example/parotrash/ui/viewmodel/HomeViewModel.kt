@@ -51,12 +51,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 if (location != null) {
                     _ubicacion.value = location
                 } else {
-                    // Si no puede obtener actual, usar última conocida
                     val lastLocation = locationManager.getLastKnownLocation()
                     _ubicacion.value = lastLocation
                 }
             } catch (e: Exception) {
-                // Si falla, intentar última conocida
                 val lastLocation = locationManager.getLastKnownLocation()
                 _ubicacion.value = lastLocation
             } finally {
@@ -75,6 +73,44 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun actualizarTipo(nuevoTipo: String) {
         tipo = nuevoTipo
         errorReporte = null
+    }
+
+    // Función para reportes rápidos desde los diálogos
+    fun reportarRapido(tipoReporte: String) {
+        val uid = auth.currentUser?.uid
+        val currentUbicacion = _ubicacion.value
+
+        if (uid == null || currentUbicacion == null) {
+            errorReporte = if (uid == null) "⚠️ Debes iniciar sesión" else "📍 Se requiere ubicación"
+            return
+        }
+
+        cargandoReporte = true
+        errorReporte = null
+
+        val ubicacionCoords = listOf(
+            currentUbicacion.latitude,
+            currentUbicacion.longitude
+        )
+
+        val reporte = Reporte(
+            id_usuario = uid,
+            descripcion = "Reporte rápido: $tipoReporte",
+            fechapublicacion = System.currentTimeMillis(),
+            tipo = tipoReporte,
+            ubicacion = ubicacionCoords
+        )
+
+        firestore.collection("reportes")
+            .add(reporte)
+            .addOnSuccessListener {
+                cargandoReporte = false
+                reporteExito = true
+            }
+            .addOnFailureListener { error ->
+                cargandoReporte = false
+                errorReporte = "❌ Error: ${error.message}"
+            }
     }
 
     fun subirReporte() {

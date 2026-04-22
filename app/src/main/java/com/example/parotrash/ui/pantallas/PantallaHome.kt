@@ -15,12 +15,7 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
+import com.example.parotrash.ui.componentes.DialogoReporte
 import com.example.parotrash.ui.componentes.SelectorIconos
 import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.HomeViewModel
@@ -52,6 +48,9 @@ fun PantallaHome(
     val ubicacion by homeViewModel.ubicacion.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState()
     val scope = rememberCoroutineScope()
+    
+    // Estado para controlar qué diálogo mostrar
+    var reporteSeleccionado by remember { mutableStateOf<String?>(null) }
     
     // Detectamos si el sistema está en modo oscuro
     val esModoOscuro = isSystemInDarkTheme()
@@ -167,11 +166,51 @@ fun PantallaHome(
         // Selector de Iconos (Cono) - A la derecha
         SelectorIconos(
             onIconoSeleccionado = { icono ->
-                // Por ahora no hace nada
+                reporteSeleccionado = icono
             },
             modifier = Modifier
                 .padding(end = 16.dp, bottom = 32.dp)
                 .align(Alignment.BottomEnd)
         )
+
+        // Lógica de Diálogos de Reporte
+        when (reporteSeleccionado) {
+            "iconalertas" -> DialogoReporte(
+                titulo = "¿Desea reportar una alerta?",
+                iconoRes = R.drawable.iconalertas,
+                onDescartar = { reporteSeleccionado = null },
+                onAceptar = { 
+                    homeViewModel.reportarRapido("Alerta")
+                    reporteSeleccionado = null 
+                }
+            )
+            "iconbus" -> DialogoReporte(
+                titulo = "¿Desea reportar un bus varado?",
+                iconoRes = R.drawable.iconbus,
+                onDescartar = { reporteSeleccionado = null },
+                onAceptar = { 
+                    homeViewModel.reportarRapido("Bus Varado")
+                    reporteSeleccionado = null 
+                }
+            )
+            "iconchoque" -> DialogoReporte(
+                titulo = "¿Desea reportar un accidente?",
+                iconoRes = R.drawable.iconchoque,
+                onDescartar = { reporteSeleccionado = null },
+                onAceptar = { 
+                    homeViewModel.reportarRapido("Accidente")
+                    reporteSeleccionado = null 
+                }
+            )
+            "iconmanifestacion" -> DialogoReporte(
+                titulo = "¿Desea reportar una manifestación?",
+                iconoRes = R.drawable.iconmanifestacion,
+                onDescartar = { reporteSeleccionado = null },
+                onAceptar = { 
+                    homeViewModel.reportarRapido("Manifestación")
+                    reporteSeleccionado = null 
+                }
+            )
+        }
     }
 }
