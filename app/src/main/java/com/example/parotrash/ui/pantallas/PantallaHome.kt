@@ -60,9 +60,7 @@ fun PantallaHome(
     val reportesConfirmados = remember { mutableStateListOf<String>() }
 
     val esModoOscuro = isSystemInDarkTheme()
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(4.6097, -74.0817), 14f)
-    }
+    val cameraPositionState = rememberCameraPositionState()
 
     val iconosCacheados = rememberIconosReporte(context)
 
@@ -96,12 +94,10 @@ fun PantallaHome(
     }
 
     LaunchedEffect(ubicacion) {
-        if (cameraPositionState.position.zoom < 10f) {
-            ubicacion?.let {
-                cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                    LatLng(it.latitude, it.longitude), 17f
-                )
-            }
+        ubicacion?.let {
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                LatLng(it.latitude, it.longitude), 17f
+            )
         }
     }
 
