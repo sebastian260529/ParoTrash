@@ -14,7 +14,10 @@ fun DialogosHome(
     onConfirmarNuevoReporte: (String) -> Unit,
     onDismissConfirmacion: () -> Unit,
     onConfirmarExistente: (String) -> Unit,
-    onDescartarExistente: (String) -> Unit
+    onDescartarExistente: (String) -> Unit,
+    isLoadingConfirmar: Boolean = false,
+    isLoadingDescartar: Boolean = false,
+    errorMessageConfirmar: String? = null
 ) {
     val config = mapOf(
         "iconalertas" to ("Alerta" to R.drawable.iconalertas),
@@ -47,6 +50,9 @@ fun DialogosHome(
         DialogoConfirmacionReporte(
             tipo = reporte.tipo,
             iconoRes = iconoRes,
+            isLoadingConfirmar = isLoadingConfirmar,
+            isLoadingDescartar = isLoadingDescartar,
+            errorMessage = errorMessageConfirmar,
             onDescartar = { onDescartarExistente(reporte.id) },
             onConfirmar = { onConfirmarExistente(reporte.id) }
         )

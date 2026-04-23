@@ -24,6 +24,9 @@ import com.example.parotrash.ui.theme.ParoTrashTheme
 fun DialogoConfirmacionReporte(
     tipo: String,
     iconoRes: Int,
+    isLoadingConfirmar: Boolean = false,
+    isLoadingDescartar: Boolean = false,
+    errorMessage: String? = null,
     onDescartar: () -> Unit,
     onConfirmar: () -> Unit
 ) {
@@ -66,6 +69,16 @@ fun DialogoConfirmacionReporte(
                     tint = Color.Unspecified
                 )
 
+                errorMessage?.let { error ->
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -80,19 +93,28 @@ fun DialogoConfirmacionReporte(
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.onSurface
-                        )
+                        ),
+                        enabled = !isLoadingDescartar
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text("No", fontSize = 16.sp)
-                            Spacer(Modifier.width(8.dp))
-                            Icon(
-                                Icons.Default.ThumbDown,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                        if (isLoadingDescartar) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 2.dp
                             )
+                        } else {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text("No", fontSize = 16.sp)
+                                Spacer(Modifier.width(8.dp))
+                                Icon(
+                                    Icons.Default.ThumbDown,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
 
@@ -105,23 +127,32 @@ fun DialogoConfirmacionReporte(
                         shape = RoundedCornerShape(28.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
-                        )
+                        ),
+                        enabled = !isLoadingConfirmar
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                "Sigue",
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onPrimary
+                        if (isLoadingConfirmar) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
                             )
-                            Spacer(Modifier.width(8.dp))
-                            Icon(
-                                Icons.Default.ThumbUp,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
+                        } else {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    "Sigue",
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Icon(
+                                    Icons.Default.ThumbUp,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
                         }
                     }
                 }

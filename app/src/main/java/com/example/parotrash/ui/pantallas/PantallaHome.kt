@@ -59,6 +59,10 @@ fun PantallaHome(
     val reportes by homeViewModel.reportes.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
+    val isConfirming by alertasViewModel.isConfirming.collectAsStateWithLifecycle()
+    val isDiscarding by alertasViewModel.isDiscarding.collectAsStateWithLifecycle()
+    val errorMessageConfirmar by alertasViewModel.errorMessage.collectAsStateWithLifecycle()
+
     var reporteSeleccionado by remember { mutableStateOf<String?>(null) }
     var reporteParaConfirmar by remember { mutableStateOf<Reporte?>(null) }
     val reportesConfirmados = remember { mutableStateListOf<String>() }
@@ -182,7 +186,7 @@ fun PantallaHome(
             isLoading = homeViewModel.cargandoReporte,
             errorMessage = homeViewModel.errorReporte,
             onDismissReporte = { reporteSeleccionado = null },
-            onConfirmarNuevoReporte = { tipo -> 
+            onConfirmarNuevoReporte = { tipo ->
                 homeViewModel.reportarRapido(tipo) {
                     usuarioViewModel.registrarNuevoReporte()
                 }
@@ -190,14 +194,19 @@ fun PantallaHome(
             onDismissConfirmacion = { reporteParaConfirmar = null },
             onConfirmarExistente = { id ->
                 reportesConfirmados.add(id)
-                alertasViewModel.confirmarAlerta(id) // Lógica de alertas
-                usuarioViewModel.recibirConfirmacion() // Suma reputación
-                reporteParaConfirmar = null
+                alertasViewModel.confirmarAlerta(id) {
+                    usuarioViewModel.recibirConfirmacion()
+                    reporteParaConfirmar = null
+                }
             },
             onDescartarExistente = { id ->
-                alertasViewModel.descartarAlerta(id) // Lógica inteligente de eliminación
-                reporteParaConfirmar = null
-            }
+                alertasViewModel.descartarAlerta(id) {
+                    reporteParaConfirmar = null
+                }
+            },
+            isLoadingConfirmar = isConfirming != null,
+            isLoadingDescartar = isDiscarding != null,
+            errorMessageConfirmar = errorMessageConfirmar
         )
     }
 }
