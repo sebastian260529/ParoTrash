@@ -1,5 +1,6 @@
 package com.example.parotrash.ui.pantallas
 
+import android.Manifest
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
@@ -26,6 +27,8 @@ import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.AlertasViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModel
 import com.example.parotrash.ui.viewmodel.UsuarioViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -37,7 +40,9 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MyLocation
+import com.google.accompanist.permissions.isGranted
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun PantallaHome(
     homeViewModel: HomeViewModel,
@@ -51,7 +56,6 @@ fun PantallaHome(
     val lifecycleOwner = LocalLifecycleOwner.current
     val ubicacion by homeViewModel.ubicacion.collectAsStateWithLifecycle()
     val isLoadingLocation by homeViewModel.isLoading.collectAsStateWithLifecycle()
-    val permisoConcedido by homeViewModel.permisoConcedido.collectAsStateWithLifecycle()
     val reportes by homeViewModel.reportes.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -63,6 +67,8 @@ fun PantallaHome(
     val cameraPositionState = rememberCameraPositionState()
 
     val iconosCacheados = rememberIconosReporte(context)
+
+    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     // Limpiar alertas antiguas al iniciar
     LaunchedEffect(Unit) {
@@ -76,11 +82,27 @@ fun PantallaHome(
         }
     }
 
+    // Solicitar permisos de ubicación al entrar por primera vez
+    LaunchedEffect(Unit) {
+        if (!locationPermissionState.status.isGranted) {
+            locationPermissionState.launchPermissionRequest()
+        }
+    }
+
+    // Obtener ubicación cuando el permiso esté concedido
+    LaunchedEffect(locationPermissionState.status.isGranted) {
+        if (locationPermissionState.status.isGranted) {
+            homeViewModel.actualizarPermisos()
+            homeViewModel.obtenerUbicacion()
+        }
+    }
+
+    // Actualizar ubicación al volver de background
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 homeViewModel.actualizarPermisos()
-                if (homeViewModel.tienePermiso() && homeViewModel.ubicacion.value == null) {
+                if (homeViewModel.tienePermiso()) {
                     homeViewModel.obtenerUbicacion()
                 }
             }
@@ -89,10 +111,7 @@ fun PantallaHome(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    LaunchedEffect(permisoConcedido) {
-        if (permisoConcedido) homeViewModel.obtenerUbicacion()
-    }
-
+    // Mover cámara a ubicación actual
     LaunchedEffect(ubicacion) {
         ubicacion?.let {
             cameraPositionState.position = CameraPosition.fromLatLngZoom(
@@ -106,7 +125,7 @@ fun PantallaHome(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
-                isMyLocationEnabled = permisoConcedido,
+                isMyLocationEnabled = locationPermissionState.status.isGranted,
                 mapStyleOptions = if (esModoOscuro) {
                     try { MapStyleOptions.loadRawResourceStyle(context, R.raw.mapa_oscuro) } catch (e: Exception) { null }
                 } else null

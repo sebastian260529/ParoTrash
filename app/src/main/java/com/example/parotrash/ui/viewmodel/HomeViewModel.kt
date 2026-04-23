@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parotrash.data.LocationManager
+import com.example.parotrash.data.PermissionPreferences
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.modelos.Reporte
 import com.google.firebase.auth.FirebaseAuth
@@ -16,11 +17,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val locationManager = LocationManager(application)
+    private val permissionPreferences = PermissionPreferences(application)
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
@@ -53,6 +56,22 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         escucharReportes()
+        cargarUbicacionGuardada()
+    }
+
+    private fun cargarUbicacionGuardada() {
+        viewModelScope.launch {
+            val lat = permissionPreferences.lastLatitude.first()
+            val lon = permissionPreferences.lastLongitude.first()
+            if (lat != null && lon != null) {
+                val savedLocation = Location("saved").apply {
+                    latitude = lat
+                    longitude = lon
+                }
+                _ubicacion.value = savedLocation
+                Log.d("HomeViewModel", "Ubicación guardada cargada: $lat, $lon")
+            }
+        }
     }
 
     private fun escucharReportes() {
@@ -100,13 +119,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
                 if (location != null) {
                     _ubicacion.value = location
+                    permissionPreferences.setLastLocation(location.latitude, location.longitude)
+                    Log.d("HomeViewModel", "Nueva ubicación obtenida y guardada: ${location.latitude}, ${location.longitude}")
                 } else {
                     val lastLocation = locationManager.getLastKnownLocation()
                     _ubicacion.value = lastLocation
+                    lastLocation?.let {
+                        permissionPreferences.setLastLocation(it.latitude, it.longitude)
+                    }
                 }
             } catch (e: Exception) {
                 val lastLocation = locationManager.getLastKnownLocation()
                 _ubicacion.value = lastLocation
+                lastLocation?.let {
+                    permissionPreferences.setLastLocation(it.latitude, it.longitude)
+                }
             } finally {
                 _isLoading.value = false
             }
