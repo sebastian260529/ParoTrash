@@ -13,16 +13,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.parotrash.ui.theme.ParoTrashTheme
 
 @Composable
 fun DialogoReporte(
     titulo: String,
     iconoRes: Int,
+    isLoading: Boolean = false,
+    errorMessage: String? = null,
     onDescartar: () -> Unit,
     onAceptar: () -> Unit
 ) {
-    Dialog(onDismissRequest = onDescartar) {
+    Dialog(
+        onDismissRequest = onDescartar,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,13 +57,24 @@ fun DialogoReporte(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                // Icono agrandado y sin el marco extra
+                // Icono
                 Icon(
                     painter = painterResource(id = iconoRes),
                     contentDescription = null,
                     modifier = Modifier.size(150.dp),
                     tint = Color.Unspecified
                 )
+
+                // Mensaje de error abajo de la imagen
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -66,6 +83,7 @@ fun DialogoReporte(
                     // Botón Descartar
                     OutlinedButton(
                         onClick = onDescartar,
+                        enabled = !isLoading,
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp),
@@ -78,18 +96,13 @@ fun DialogoReporte(
                         Text("Descartar", fontSize = 14.sp)
                     }
 
-                    // Botón Aceptar
-                    Button(
-                        onClick = onAceptar,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                    // Botón Aceptar (BotonCargando responsivo)
+                    Box(modifier = Modifier.weight(1f)) {
+                        BotonCargando(
+                            nombre = "Aceptar",
+                            isLoading = isLoading,
+                            onClick = onAceptar
                         )
-                    ) {
-                        Text("Aceptar", fontSize = 14.sp, color = Color.White)
                     }
                 }
             }

@@ -67,13 +67,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     val listaValida = mutableListOf<Reporte>()
                     for (doc in snapshot.documents) {
                         try {
-                            // Intentamos convertir el documento al objeto Reporte
                             val reporte = doc.toObject(Reporte::class.java)?.copy(id = doc.id)
                             if (reporte != null) {
                                 listaValida.add(reporte)
                             }
                         } catch (e: Exception) {
-                            // Si falla un solo reporte, lo ignoramos y seguimos con los demás
                             Log.e("HomeViewModel", "Error al procesar reporte ${doc.id}: ${e.message}")
                         }
                     }
@@ -93,12 +91,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
             _isLoading.value = true
             try {
-                // Intentamos obtener la ubicación actual. 
-                // Si el GPS se acaba de activar, puede tardar unos segundos en estar disponible.
                 var location = locationManager.getCurrentLocation()
-                
+
                 if (location == null) {
-                    // Si es null, esperamos un poco y reintentamos, por si el hardware está iniciando.
                     delay(1500)
                     location = locationManager.getCurrentLocation()
                 }
@@ -106,7 +101,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 if (location != null) {
                     _ubicacion.value = location
                 } else {
-                    // Como último recurso, usamos la última ubicación conocida.
                     val lastLocation = locationManager.getLastKnownLocation()
                     _ubicacion.value = lastLocation
                 }
@@ -121,35 +115,30 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun tienePermiso(): Boolean = locationManager.hasLocationPermission()
 
-    fun actualizarDescripcion(nuevaDescripcion: String) {
-        descripcion = nuevaDescripcion
-        errorReporte = null
-    }
 
-    fun actualizarTipo(nuevoTipo: String) {
-        tipo = nuevoTipo
-        errorReporte = null
-    }
-
-    // Función para reportes rápidos desde los diálogos
-    fun reportarRapido(tipoReporte: String) {
-        val uid = auth.currentUser?.uid
+    // La lógica de estadísticas se movió a UsuarioViewModel para mayor atomicidad
+    fun reportarRapido(tipoReporte: String, onExito: () -> Unit = {}) {
+        val uid = auth.currentUser?.uid ?: "Invitado_Default"
         val currentUbicacion = _ubicacion.value
 
-        if (uid == null || currentUbicacion == null) {
-            errorReporte = if (uid == null) "⚠️ Debes iniciar sesión" else "📍 Se requiere ubicación"
+        if (currentUbicacion == null) {
+            errorReporte = "📍 Se requiere ubicación"
             return
         }
 
         cargandoReporte = true
         errorReporte = null
+        reporteExito = false
 
         val ubicacionCoords = listOf(
             currentUbicacion.latitude,
             currentUbicacion.longitude
         )
 
+        val docRef = firestore.collection("reportes").document()
+
         val reporte = Reporte(
+            id = docRef.id,
             id_usuario = uid,
             descripcion = "Reporte rápido: $tipoReporte",
             fechapublicacion = System.currentTimeMillis(),
@@ -157,11 +146,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             ubicacion = ubicacionCoords
         )
 
-        firestore.collection("reportes")
-            .add(reporte)
+        docRef.set(reporte)
             .addOnSuccessListener {
                 cargandoReporte = false
                 reporteExito = true
+                onExito() // Callback para que UsuarioViewModel actualice estadísticas
             }
             .addOnFailureListener { error ->
                 cargandoReporte = false
@@ -169,67 +158,5 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
-    fun subirReporte() {
-        var hayError = false
 
-        if (descripcion.isEmpty()) {
-            errorReporte = "📝 La descripción no puede estar vacía"
-            hayError = true
-        }
-        if (tipo.isEmpty()) {
-            errorReporte = "🏷️ Selecciona un tipo de reporte"
-            hayError = true
-        }
-        if (_ubicacion.value == null) {
-            errorReporte = "📍 Se requiere ubicación"
-            hayError = true
-        }
-
-        if (hayError) return
-
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            errorReporte = "⚠️ Debes iniciar sesión"
-            return
-        }
-
-        cargandoReporte = true
-        errorReporte = null
-
-        val ubicacionCoords = listOf(
-            _ubicacion.value!!.latitude,
-            _ubicacion.value!!.longitude
-        )
-
-        val reporte = Reporte(
-            id_usuario = uid,
-            descripcion = descripcion,
-            fechapublicacion = System.currentTimeMillis(),
-            tipo = tipo,
-            ubicacion = ubicacionCoords
-        )
-
-        firestore.collection("reportes")
-            .add(reporte)
-            .addOnSuccessListener {
-                cargandoReporte = false
-                reporteExito = true
-                descripcion = ""
-                tipo = ""
-            }
-            .addOnFailureListener { error ->
-                cargandoReporte = false
-                errorReporte = "❌ Error al subir reporte: ${error.message}"
-            }
-    }
-
-    fun cerrarSesion(sessionManager: SessionManager, onComplete: () -> Unit) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            sessionManager.logout()
-            _ubicacion.value = null
-            _isLoading.value = false
-            onComplete()
-        }
-    }
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.parotrash.ui.theme.ParoTrashTheme
 
 @Composable
@@ -26,16 +27,19 @@ fun DialogoConfirmacionReporte(
     onDescartar: () -> Unit,
     onConfirmar: () -> Unit
 ) {
-    Dialog(onDismissRequest = onDescartar) {
+    Dialog(
+        onDismissRequest = onDescartar,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(40.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = ParoTrashTheme.customColors.mapElementBackground
             ),
-            border = BorderStroke(2.dp, Color.Red)
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
         ) {
             Column(
                 modifier = Modifier
@@ -52,7 +56,7 @@ fun DialogoConfirmacionReporte(
                         lineHeight = 28.sp
                     ),
                     textAlign = TextAlign.Center,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Icon(
@@ -73,9 +77,9 @@ fun DialogoConfirmacionReporte(
                             .weight(1f)
                             .height(56.dp),
                         shape = RoundedCornerShape(28.dp),
-                        border = BorderStroke(1.dp, Color.Red),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.Black
+                            contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
                         Row(
@@ -84,7 +88,11 @@ fun DialogoConfirmacionReporte(
                         ) {
                             Text("No", fontSize = 16.sp)
                             Spacer(Modifier.width(8.dp))
-                            Icon(Icons.Default.ThumbDown, contentDescription = null, tint = Color.Red)
+                            Icon(
+                                Icons.Default.ThumbDown,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
 
@@ -96,16 +104,24 @@ fun DialogoConfirmacionReporte(
                             .height(56.dp),
                         shape = RoundedCornerShape(28.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
+                            containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text("Sigue", fontSize = 16.sp, color = Color.White)
+                            Text(
+                                "Sigue",
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                             Spacer(Modifier.width(8.dp))
-                            Icon(Icons.Default.ThumbUp, contentDescription = null, tint = Color.White)
+                            Icon(
+                                Icons.Default.ThumbUp,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 }

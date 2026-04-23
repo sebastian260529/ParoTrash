@@ -41,6 +41,7 @@ fun PantallaInicioSesion(
     val correo = viewModel.correo
     val contrasena = viewModel.contraseña
     val cargando = viewModel.cargando
+    val cargandoInvitado = viewModel.cargandoInvitado
     val errorCorreo = viewModel.errorCorreo
     val errorContrasena = viewModel.errorContraseña
     val errorGeneral = viewModel.errorGeneral
@@ -116,7 +117,7 @@ fun PantallaInicioSesion(
         )
         BotonCargando(
             nombre = stringResource(R.string.continuar_como_invitado),
-            isLoading = false,
+            isLoading = cargandoInvitado,
             onClick = { viewModel.iniciarComoInvitado() }
         )
 

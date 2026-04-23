@@ -24,11 +24,13 @@ import com.example.parotrash.ui.pantallas.PantallaPermisos
 import com.example.parotrash.ui.pantallas.PantallaRecuperarContraseña
 import com.example.parotrash.ui.pantallas.PantallaRegistrarse
 import com.example.parotrash.ui.pantallas.PantallaRegistroExitoso
+import com.example.parotrash.ui.viewmodel.AlertasViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModelFactory
 import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 import com.example.parotrash.ui.viewmodel.RecuperarViewModel
 import com.example.parotrash.ui.viewmodel.RegistroViewModel
+import com.example.parotrash.ui.viewmodel.UsuarioViewModel
 
 @Composable
 fun NavegacionApp(
@@ -42,6 +44,8 @@ fun NavegacionApp(
     val loginViewModel: InicioSesionViewModel = viewModel()
     val registroViewModel: RegistroViewModel = viewModel()
     val recuperarViewModel: RecuperarViewModel = viewModel()
+    val usuarioViewModel: UsuarioViewModel = viewModel()
+    val alertasViewModel: AlertasViewModel = viewModel()
     val homeViewModelFactory = HomeViewModelFactory(LocalContext.current.applicationContext as Application)
     val homeViewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
 
@@ -136,6 +140,8 @@ fun NavegacionApp(
         composable(Pantallas.Home.ruta) {
             PantallaHome(
                 homeViewModel = homeViewModel,
+                usuarioViewModel = usuarioViewModel,
+                alertasViewModel = alertasViewModel,
                 irACerrarSesion = {
                     navController.navigate(Pantallas.InicioSesion.ruta) {
                         popUpTo(Pantallas.Home.ruta) {
