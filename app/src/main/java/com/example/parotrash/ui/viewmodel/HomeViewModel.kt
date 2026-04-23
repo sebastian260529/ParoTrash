@@ -9,6 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parotrash.data.LocationManager
+import com.example.parotrash.data.NotificationHelper
+import com.example.parotrash.data.NotificationPreferences
 import com.example.parotrash.data.PermissionPreferences
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.modelos.Reporte
@@ -24,8 +26,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val locationManager = LocationManager(application)
     private val permissionPreferences = PermissionPreferences(application)
+    private val notificationPreferences = NotificationPreferences(application)
+    private val notificationHelper = NotificationHelper(application)
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+
+    private val RADIO_NOTIFICACION_METROS = 100f // Radio de 100 metros, cambiar aquí si se quiere
 
     private val _ubicacion = MutableStateFlow<Location?>(null)
     val ubicacion: StateFlow<Location?> = _ubicacion
@@ -38,6 +44,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _reportes = MutableStateFlow<List<Reporte>>(emptyList())
     val reportes: StateFlow<List<Reporte>> = _reportes
+
+    private var ultimosIdsProcesados = mutableSetOf<String>()
 
     var descripcion by mutableStateOf("")
         private set
@@ -89,6 +97,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             val reporte = doc.toObject(Reporte::class.java)?.copy(id = doc.id)
                             if (reporte != null) {
                                 listaValida.add(reporte)
+
+                                // Verificar si es un nuevo reporte para mostrar notificación
+                                if (!ultimosIdsProcesados.contains(reporte.id)) {
+                                    ultimosIdsProcesados.add(reporte.id)
+                                    verificarYNotificarNuevoReporte(reporte)
+                                }
                             }
                         } catch (e: Exception) {
                             Log.e("HomeViewModel", "Error al procesar reporte ${doc.id}: ${e.message}")
@@ -97,6 +111,65 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     _reportes.value = listaValida
                 }
             }
+    }
+
+    private fun verificarYNotificarNuevoReporte(reporte: Reporte) {
+        viewModelScope.launch {
+            try {
+                // Obtener el UID del usuario actual
+                val uidActual = auth.currentUser?.uid
+
+                // No notificar si el reporte es del propio usuario
+                if (reporte.id_usuario == uidActual) {
+                    return@launch
+                }
+
+                // Verificar si el usuario tiene notificaciones habilitadas
+                val recibirAlertas = notificationPreferences.recibirAlertas.first()
+                if (!recibirAlertas) {
+                    return@launch
+                }
+
+                // Obtener la ubicación actual del usuario
+                val ubicacionActual = _ubicacion.value ?: return@launch
+
+                // Verificar si el tipo de reporte está habilitado
+                val tipoHabilitado = when (reporte.tipo) {
+                    "Alerta" -> notificationPreferences.comunidad.first()
+                    "Bus Varado", "Accidente" -> notificationPreferences.bloqueosViales.first()
+                    "Manifestación" -> notificationPreferences.manifestaciones.first()
+                    else -> false
+                }
+
+                if (!tipoHabilitado) {
+                    return@launch
+                }
+
+                // Calcular distancia entre el reporte y el usuario
+                val distancia = calcularDistancia(
+                    ubicacionActual.latitude, ubicacionActual.longitude,
+                    reporte.ubicacion[0], reporte.ubicacion[1]
+                )
+
+                // Si está dentro del radio, mostrar notificación
+                if (distancia <= RADIO_NOTIFICACION_METROS) {
+                    notificationHelper.mostrarNotificacionAlerta(
+                        tipo = reporte.tipo,
+                        descripcion = reporte.descripcion
+                    )
+                    Log.d("HomeViewModel", "Notificación enviada para: ${reporte.tipo} a ${distancia}m")
+                }
+
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error al verificar notificación: ${e.message}")
+            }
+        }
+    }
+
+    private fun calcularDistancia(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val results = FloatArray(1)
+        Location.distanceBetween(lat1, lon1, lat2, lon2, results)
+        return results[0]
     }
 
     fun actualizarPermisos() {

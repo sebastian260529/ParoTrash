@@ -8,12 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.parotrash.R
 import com.example.parotrash.ui.theme.ParoTrashTheme
 
 @Composable
@@ -94,7 +96,7 @@ fun DialogoReporte(
                             contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
-                        Text("Descartar", fontSize = 14.sp)
+                        Text(stringResource(R.string.descartar), fontSize = 14.sp)
                     }
 
                     // Botón Aceptar: BotonCargando ya tiene height 42 y padding horizontal 5 internamente

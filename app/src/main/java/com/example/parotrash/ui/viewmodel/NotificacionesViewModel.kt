@@ -23,9 +23,6 @@ class NotificacionesViewModel(
     var manifestaciones by mutableStateOf(true)
         private set
 
-    var rutasAlternativas by mutableStateOf(true)
-        private set
-
     var comunidad by mutableStateOf(true)
         private set
 
@@ -42,9 +39,6 @@ class NotificacionesViewModel(
         }
         viewModelScope.launch {
             preferences.manifestaciones.collectLatest { manifestaciones = it }
-        }
-        viewModelScope.launch {
-            preferences.rutasAlternativas.collectLatest { rutasAlternativas = it }
         }
         viewModelScope.launch {
             preferences.comunidad.collectLatest { comunidad = it }
@@ -70,13 +64,6 @@ class NotificacionesViewModel(
         manifestaciones = valor
         viewModelScope.launch {
             preferences.setManifestaciones(valor)
-        }
-    }
-
-    fun actualizarRutasAlternativas(valor: Boolean) {
-        rutasAlternativas = valor
-        viewModelScope.launch {
-            preferences.setRutasAlternativas(valor)
         }
     }
 

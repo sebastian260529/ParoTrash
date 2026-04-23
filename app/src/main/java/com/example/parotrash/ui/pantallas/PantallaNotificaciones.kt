@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.EmojiPeople
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +51,6 @@ fun PantallaNotificaciones(
     val recibirAlertas = viewModel.recibirAlertas
     val bloqueosViales = viewModel.bloqueosViales
     val manifestaciones = viewModel.manifestaciones
-    val rutasAlternativas = viewModel.rutasAlternativas
     val comunidad = viewModel.comunidad
 
     // Función para abrir configuración de notificaciones de la app
@@ -118,14 +116,6 @@ fun PantallaNotificaciones(
                 texto = stringResource(R.string.manifestaciones_1),
                 estaActivado = manifestaciones,
                 onCheckedChange = { viewModel.actualizarManifestaciones(it) },
-                habilitado = recibirAlertas
-            )
-
-            BotonConSwitch(
-                icon1 = Icons.Default.Warning,
-                texto = stringResource(R.string.rutas_alternativas_1),
-                estaActivado = rutasAlternativas,
-                onCheckedChange = { viewModel.actualizarRutasAlternativas(it) },
                 habilitado = recibirAlertas
             )
 

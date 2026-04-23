@@ -98,5 +98,6 @@
     <string name="iconbus">Bus</string>
     <string name="iconchoque">Choque</string>
     <string name="iconmanifestacion">Manifestación</string>
+    <string name="descartar">Descartar</string>
 
 </resources>
