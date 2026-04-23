@@ -200,6 +200,7 @@ fun PantallaHome(
                 }
             },
             onDescartarExistente = { id ->
+                reportesConfirmados.add(id)
                 alertasViewModel.descartarAlerta(id) {
                     reporteParaConfirmar = null
                 }
