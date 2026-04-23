@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parotrash.modelos.Reporte
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -16,8 +18,24 @@ class AlertasViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
 
     // --- CONFIGURACIÓN DE TIEMPO DE VIDA (en minutos) ---
-    private val minutosDeVida = 1 // Cambia este valor para definir cuánto vive una alerta
+    private val minutosDeVida = 1 // Las alertas se eliminarán después de 1 minuto
     // ----------------------------------------------------
+
+    init {
+        iniciarLimpiezaAutomatica()
+    }
+
+    /**
+     * Inicia un bucle infinito en el viewModelScope que limpia alertas cada 30 segundos.
+     */
+    private fun iniciarLimpiezaAutomatica() {
+        viewModelScope.launch {
+            while (isActive) {
+                limpiarAlertasAntiguas()
+                delay(30000) // Verifica cada 30 segundos
+            }
+        }
+    }
 
     /**
      * Incrementa las confirmaciones de una alerta.
@@ -69,18 +87,18 @@ class AlertasViewModel : ViewModel() {
                 val limite = ahora - (minutosDeVida * 60 * 1000)
 
                 val querySnapshot = firestore.collection("reportes")
+                    .whereLessThan("fechapublicacion", limite)
                     .get()
                     .await()
 
+                if (querySnapshot.isEmpty) {
+                    Log.d("AlertasViewModel", "No hay alertas antiguas para eliminar.")
+                    return@launch
+                }
+
                 for (document in querySnapshot.documents) {
-                    val reporte = document.toObject(Reporte::class.java)
-                    if (reporte != null) {
-                        // Cambiado: Usamos directamente fechapublicacion que ya es Long
-                        if (reporte.fechapublicacion < limite) {
-                            document.reference.delete().await()
-                            Log.d("AlertasViewModel", "Reporte antiguo eliminado: ${document.id}")
-                        }
-                    }
+                    document.reference.delete().await()
+                    Log.d("AlertasViewModel", "Reporte antiguo eliminado: ${document.id}")
                 }
             } catch (e: Exception) {
                 Log.e("AlertasViewModel", "Error al limpiar alertas: ${e.message}")
