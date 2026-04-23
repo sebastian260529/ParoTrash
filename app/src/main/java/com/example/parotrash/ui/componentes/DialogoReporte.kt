@@ -80,14 +80,15 @@ fun DialogoReporte(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Botón Descartar
+                    // Botón Descartar: Copiamos exactamente la altura, padding y forma de BotonCargando
                     OutlinedButton(
                         onClick = onDescartar,
                         enabled = !isLoading,
                         modifier = Modifier
                             .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(24.dp),
+                            .height(42.dp)
+                            .padding(horizontal = 5.dp),
+                        shape = RoundedCornerShape(100.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.onSurface
@@ -96,7 +97,7 @@ fun DialogoReporte(
                         Text("Descartar", fontSize = 14.sp)
                     }
 
-                    // Botón Aceptar (BotonCargando responsivo)
+                    // Botón Aceptar: BotonCargando ya tiene height 42 y padding horizontal 5 internamente
                     Box(modifier = Modifier.weight(1f)) {
                         BotonCargando(
                             nombre = "Aceptar",
