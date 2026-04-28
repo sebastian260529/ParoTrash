@@ -16,4 +16,5 @@ sealed class Pantallas(val ruta: String) {
     object Notificaciones : Pantallas("notificaciones")
     object Privacidad : Pantallas("privacidad")
     object Transmilenio : Pantallas("transmilenio")
+    object SITP : Pantallas("sitp")
 }
