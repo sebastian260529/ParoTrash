@@ -24,6 +24,7 @@ import com.example.parotrash.ui.pantallas.PantallaPermisos
 import com.example.parotrash.ui.pantallas.PantallaRecuperarContraseña
 import com.example.parotrash.ui.pantallas.PantallaRegistrarse
 import com.example.parotrash.ui.pantallas.PantallaRegistroExitoso
+import com.example.parotrash.ui.pantallas.PantallaTransmilenio
 import com.example.parotrash.ui.viewmodel.AlertasViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModelFactory
@@ -267,6 +268,11 @@ fun NavegacionApp(
                     navController.popBackStack()
                 },
                 permissionPreferences = permissionPreferences
+            )
+        }
+        composable(Pantallas.Transmilenio.ruta) {
+            PantallaTransmilenio(
+                irAHome = { navController.popBackStack() }
             )
         }
 
