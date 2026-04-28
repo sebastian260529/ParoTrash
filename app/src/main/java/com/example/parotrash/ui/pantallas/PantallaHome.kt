@@ -19,9 +19,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.modelos.Reporte
+import com.example.parotrash.modelos.EstacionTransmilenio
 import com.example.parotrash.ui.componentes.BotonControlCircular
 import com.example.parotrash.ui.componentes.DialogosHome
 import com.example.parotrash.ui.componentes.MapMarkers
+import com.example.parotrash.ui.componentes.EstacionesMarkers
 import com.example.parotrash.ui.componentes.SelectorIconos
 import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.AlertasViewModel
@@ -57,6 +59,7 @@ fun PantallaHome(
     val ubicacion by homeViewModel.ubicacion.collectAsStateWithLifecycle()
     val isLoadingLocation by homeViewModel.isLoading.collectAsStateWithLifecycle()
     val reportes by homeViewModel.reportes.collectAsStateWithLifecycle()
+    val estaciones by homeViewModel.estaciones.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
     val isConfirming by alertasViewModel.isConfirming.collectAsStateWithLifecycle()
@@ -71,6 +74,7 @@ fun PantallaHome(
     val cameraPositionState = rememberCameraPositionState()
 
     val iconosCacheados = rememberIconosReporte(context)
+    val iconosEstaciones = rememberIconosEstaciones(context)
 
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -143,6 +147,12 @@ fun PantallaHome(
                 reportesConfirmados = reportesConfirmados,
                 onMarkerClick = { reporteParaConfirmar = it }
             )
+            if (iconosEstaciones != null) {
+                EstacionesMarkers(
+                    estaciones = estaciones,
+                    iconos = iconosEstaciones
+                )
+            }
         }
 
         if (isLoadingLocation) {
@@ -229,6 +239,24 @@ fun rememberIconosReporte(context: android.content.Context): Map<String, BitmapD
                 "Default" to crear(R.drawable.iconalertas)
             )
         } catch (e: Exception) { Log.e("MapsError", "Iconos error: ${e.message}") }
+    }
+    return iconos
+}
+
+@Composable
+fun rememberIconosEstaciones(context: android.content.Context): Map<Int, BitmapDescriptor>? {
+    var iconos by remember { mutableStateOf<Map<Int, BitmapDescriptor>?>(null) }
+    LaunchedEffect(Unit) {
+        try {
+            val escala = 60
+            fun crear(color: Float) = BitmapDescriptorFactory.defaultMarker(color)
+            iconos = mapOf(
+                1 to crear(BitmapDescriptorFactory.HUE_RED),
+                2 to crear(BitmapDescriptorFactory.HUE_YELLOW),
+                3 to crear(BitmapDescriptorFactory.HUE_GREEN),
+                4 to crear(BitmapDescriptorFactory.HUE_AZURE)
+            )
+        } catch (e: Exception) { Log.e("MapsError", "Iconos estaciones error: ${e.message}") }
     }
     return iconos
 }

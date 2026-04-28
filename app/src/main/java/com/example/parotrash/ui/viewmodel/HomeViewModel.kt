@@ -13,7 +13,9 @@ import com.example.parotrash.data.NotificationHelper
 import com.example.parotrash.data.NotificationPreferences
 import com.example.parotrash.data.PermissionPreferences
 import com.example.parotrash.data.SessionManager
+import com.example.parotrash.data.EstacionesRepository
 import com.example.parotrash.modelos.Reporte
+import com.example.parotrash.modelos.EstacionTransmilenio
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
@@ -30,6 +32,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val notificationHelper = NotificationHelper(application)
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+    private val estacionesRepository = EstacionesRepository()
 
     private val RADIO_NOTIFICACION_METROS = 100f // Radio de 100 metros, cambiar aquí si se quiere
 
@@ -44,6 +47,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _reportes = MutableStateFlow<List<Reporte>>(emptyList())
     val reportes: StateFlow<List<Reporte>> = _reportes
+
+    private val _estaciones = MutableStateFlow<List<EstacionTransmilenio>>(emptyList())
+    val estaciones: StateFlow<List<EstacionTransmilenio>> = _estaciones
 
     private var ultimosIdsProcesados = mutableSetOf<String>()
 
@@ -65,6 +71,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     init {
         escucharReportes()
         cargarUbicacionGuardada()
+        cargarEstaciones()
+    }
+
+    private fun cargarEstaciones() {
+        viewModelScope.launch {
+            val resultado = estacionesRepository.obtenerEstaciones()
+            resultado.onSuccess { estaciones ->
+                _estaciones.value = estaciones
+                Log.d("HomeViewModel", "Estaciones cargadas: ${estaciones.size}")
+            }.onFailure { error ->
+                Log.e("HomeViewModel", "Error cargando estaciones: ${error.message}")
+            }
+        }
     }
 
     private fun cargarUbicacionGuardada() {
