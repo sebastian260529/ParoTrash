@@ -20,6 +20,7 @@ import com.example.parotrash.R
 import com.example.parotrash.data.SessionManager
 import com.example.parotrash.modelos.Reporte
 import com.example.parotrash.ui.componentes.BotonControlCircular
+import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.DialogosHome
 import com.example.parotrash.ui.componentes.MapMarkers
 import com.example.parotrash.ui.componentes.SelectorIconos
@@ -40,6 +41,10 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import com.google.accompanist.permissions.isGranted
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -66,6 +71,7 @@ fun PantallaHome(
     var reporteSeleccionado by remember { mutableStateOf<String?>(null) }
     var reporteParaConfirmar by remember { mutableStateOf<Reporte?>(null) }
     val reportesConfirmados = remember { mutableStateListOf<String>() }
+    var mostrarDialogoBusqueda by remember { mutableStateOf(false) }
 
     val esModoOscuro = isSystemInDarkTheme()
     val cameraPositionState = rememberCameraPositionState()
@@ -174,8 +180,21 @@ fun PantallaHome(
                 )
             }
 
-            Box(modifier = Modifier.align(Alignment.BottomEnd).widthIn(max = 400.dp)) {
+            Box(modifier = Modifier.align(Alignment.BottomEnd).widthIn(max = 400.dp).padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 120.dp)) {
                 SelectorIconos(onIconoSeleccionado = { reporteSeleccionado = it })
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp)
+            ) {
+                BotonInformacion(
+                    icon1 = Icons.Default.Search,
+                    texto = "¿A donde vas?",
+                    onClick = { mostrarDialogoBusqueda = true }
+                )
             }
         }
 
@@ -209,6 +228,19 @@ fun PantallaHome(
             isLoadingDescartar = isDiscarding != null,
             errorMessageConfirmar = errorMessageConfirmar
         )
+
+        if (mostrarDialogoBusqueda) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoBusqueda = false },
+                title = { Text("Buscar destino") },
+                text = { Text("Esta función te permitirá buscar tu destino y encontrar la mejor ruta.") },
+                confirmButton = {
+                    TextButton(onClick = { mostrarDialogoBusqueda = false }) {
+                        Text("Cerrar")
+                    }
+                }
+            )
+        }
     }
 }
 
