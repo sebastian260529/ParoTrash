@@ -21,6 +21,7 @@ import com.example.parotrash.data.SessionManager
 import com.example.parotrash.modelos.Reporte
 import com.example.parotrash.ui.componentes.BotonControlCircular
 import com.example.parotrash.ui.componentes.BotonInformacion
+import com.example.parotrash.ui.componentes.DialogoBuscarDestino
 import com.example.parotrash.ui.componentes.DialogosHome
 import com.example.parotrash.ui.componentes.MapMarkers
 import com.example.parotrash.ui.componentes.SelectorIconos
@@ -42,9 +43,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import com.google.accompanist.permissions.isGranted
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -230,15 +228,13 @@ fun PantallaHome(
         )
 
         if (mostrarDialogoBusqueda) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoBusqueda = false },
-                title = { Text("Buscar destino") },
-                text = { Text("Esta función te permitirá buscar tu destino y encontrar la mejor ruta.") },
-                confirmButton = {
-                    TextButton(onClick = { mostrarDialogoBusqueda = false }) {
-                        Text("Cerrar")
-                    }
-                }
+            DialogoBuscarDestino(
+                onDismiss = { mostrarDialogoBusqueda = false },
+                onClickDesde = { /* TODO: Implementar acción */ },
+                onClickDestino = { /* TODO: Implementar acción */ },
+                onClickFavoritos = { /* TODO: Implementar acción */ },
+                onClickAnadirLugar = { /* TODO: Implementar acción */ },
+                onClickComenzarViaje = { /* TODO: Implementar acción */ }
             )
         }
     }
