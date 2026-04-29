@@ -7,7 +7,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -40,7 +44,8 @@ private val BOGOTA = LatLng(4.6091, -74.0817)
 
 @Composable
 fun PantallaSITP(
-    irAHome: () -> Unit
+    irAHome: () -> Unit,
+    irARutasFavoritas: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -96,6 +101,17 @@ fun PantallaSITP(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Volver"
+                )
+            }
+
+            IconButton(
+                onClick = irARutasFavoritas,
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Rutas Favoritas",
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }

@@ -26,6 +26,7 @@ import com.example.parotrash.ui.pantallas.PantallaRegistrarse
 import com.example.parotrash.ui.pantallas.PantallaRegistroExitoso
 import com.example.parotrash.ui.pantallas.PantallaTransmilenio
 import com.example.parotrash.ui.pantallas.PantallaSITP
+import com.example.parotrash.ui.pantallas.PantallaRutasFavoritas
 import com.example.parotrash.ui.viewmodel.AlertasViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModelFactory
@@ -273,11 +274,18 @@ fun NavegacionApp(
         }
         composable(Pantallas.Transmilenio.ruta) {
             PantallaTransmilenio(
-                irAHome = { navController.popBackStack() }
+                irAHome = { navController.popBackStack() },
+                irARutasFavoritas = { navController.navigate(Pantallas.RutasFavoritas.ruta) }
             )
         }
         composable(Pantallas.SITP.ruta) {
             PantallaSITP(
+                irAHome = { navController.popBackStack() },
+                irARutasFavoritas = { navController.navigate(Pantallas.RutasFavoritas.ruta) }
+            )
+        }
+        composable(Pantallas.RutasFavoritas.ruta) {
+            PantallaRutasFavoritas(
                 irAHome = { navController.popBackStack() }
             )
         }
