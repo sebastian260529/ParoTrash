@@ -19,15 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun BotonCargando(
     nombre: String,
     isLoading: Boolean,
     onClick: () -> Unit,
-    icon1: ImageVector? = null,
-    fontSize: Int = 14
+    icon1: ImageVector? = null
 ) {
     Button(
         onClick = onClick,
@@ -39,7 +37,7 @@ fun BotonCargando(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+            .height(42.dp)
             .padding(horizontal = 5.dp)
     ) {
         if (isLoading) {
@@ -58,9 +56,9 @@ fun BotonCargando(
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
-                Text(nombre, color = MaterialTheme.colorScheme.onPrimary, fontSize = fontSize.sp)
+                Text(nombre, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }

@@ -110,24 +110,18 @@ fun DialogoBuscarDestino(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BotonSimple(
-                        texto = "Viajes Favoritos",
+                    ViajesFavoritosButton(
                         onClick = onClickFavoritos,
-                        modifier = Modifier.weight(1.1f),
-                        icon1 = Icons.Default.Star
+                        modifier = Modifier.weight(1.1f)
                     )
 
-Box(modifier = Modifier.weight(0.9f)) {
-                        BotonCargando(
-                            nombre = "Añadir Lugar",
-                            isLoading = false,
-                            onClick = onClickAnadirLugar,
-                            icon1 = Icons.Default.Add
-                        )
-                    }
+                    AnadirLugarButton(
+                        onClick = onClickAnadirLugar,
+                        modifier = Modifier.weight(0.9f)
+                    )
                 }
 
                 Text(
