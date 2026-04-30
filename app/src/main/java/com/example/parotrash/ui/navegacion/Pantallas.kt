@@ -15,4 +15,7 @@ sealed class Pantallas(val ruta: String) {
     object CambiarContrasena : Pantallas("cambiar_contrasena")
     object Notificaciones : Pantallas("notificaciones")
     object Privacidad : Pantallas("privacidad")
+    object Transmilenio : Pantallas("transmilenio")
+    object SITP : Pantallas("sitp")
+    object RutasFavoritas : Pantallas("rutas_favoritas")
 }

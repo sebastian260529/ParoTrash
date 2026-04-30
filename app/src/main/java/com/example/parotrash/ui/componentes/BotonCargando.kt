@@ -25,7 +25,8 @@ fun BotonCargando(
     nombre: String,
     isLoading: Boolean,
     onClick: () -> Unit,
-    icon1: ImageVector? = null
+    icon1: ImageVector? = null,
+    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
@@ -35,7 +36,7 @@ fun BotonCargando(
             containerColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.primary
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(42.dp)
             .padding(horizontal = 5.dp)
