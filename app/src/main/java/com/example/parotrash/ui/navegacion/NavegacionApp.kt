@@ -27,6 +27,7 @@ import com.example.parotrash.ui.pantallas.PantallaRegistroExitoso
 import com.example.parotrash.ui.pantallas.PantallaTransmilenio
 import com.example.parotrash.ui.pantallas.PantallaSITP
 import com.example.parotrash.ui.pantallas.PantallaRutasFavoritas
+import com.example.parotrash.modelos.LugarBusqueda
 import com.example.parotrash.ui.viewmodel.AlertasViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModel
 import com.example.parotrash.ui.viewmodel.HomeViewModelFactory
@@ -34,6 +35,7 @@ import com.example.parotrash.ui.viewmodel.InicioSesionViewModel
 import com.example.parotrash.ui.viewmodel.RecuperarViewModel
 import com.example.parotrash.ui.viewmodel.RegistroViewModel
 import com.example.parotrash.ui.viewmodel.UsuarioViewModel
+import com.example.parotrash.ui.viewmodel.RutasFavoritasViewModel
 
 @Composable
 fun NavegacionApp(
@@ -273,20 +275,44 @@ fun NavegacionApp(
             )
         }
         composable(Pantallas.Transmilenio.ruta) {
+            val rutasViewModel: RutasFavoritasViewModel = viewModel()
             PantallaTransmilenio(
                 irAHome = { navController.popBackStack() },
-                irARutasFavoritas = { navController.navigate(Pantallas.RutasFavoritas.ruta) }
+                irARutasFavoritas = { navController.navigate(Pantallas.RutasFavoritas.ruta) },
+                onEstacionSeleccionada = { nombre, lat, lng ->
+                    val lugar = LugarBusqueda(
+                        nombre = nombre,
+                        latitud = lat,
+                        longitud = lng,
+                        tipo = "estacion"
+                    )
+                    rutasViewModel.guardarSeleccionTemporal(lugar)
+                    navController.popBackStack()
+                }
             )
         }
         composable(Pantallas.SITP.ruta) {
+            val rutasViewModel: RutasFavoritasViewModel = viewModel()
             PantallaSITP(
                 irAHome = { navController.popBackStack() },
-                irARutasFavoritas = { navController.navigate(Pantallas.RutasFavoritas.ruta) }
+                irARutasFavoritas = { navController.navigate(Pantallas.RutasFavoritas.ruta) },
+                onParaderoSeleccionado = { nombre, lat, lng ->
+                    val lugar = LugarBusqueda(
+                        nombre = nombre,
+                        latitud = lat,
+                        longitud = lng,
+                        tipo = "paradero"
+                    )
+                    rutasViewModel.guardarSeleccionTemporal(lugar)
+                    navController.popBackStack()
+                }
             )
         }
         composable(Pantallas.RutasFavoritas.ruta) {
             PantallaRutasFavoritas(
-                irAHome = { navController.popBackStack() }
+                irAHome = { navController.popBackStack() },
+                irATransmilenio = { navController.navigate(Pantallas.Transmilenio.ruta) },
+                irASITP = { navController.navigate(Pantallas.SITP.ruta) }
             )
         }
 

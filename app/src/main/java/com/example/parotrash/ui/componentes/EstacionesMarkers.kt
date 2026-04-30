@@ -12,7 +12,8 @@ import com.google.maps.android.compose.rememberMarkerState
 @Composable
 fun EstacionesMarkers(
     estaciones: List<EstacionTransmilenio>,
-    iconos: Map<Int, BitmapDescriptor>
+    iconos: Map<Int, BitmapDescriptor>,
+    onEstacionClick: ((EstacionTransmilenio) -> Unit)? = null
 ) {
     estaciones.forEach { estacion ->
         val pos = LatLng(estacion.latitud, estacion.longitud)
@@ -25,7 +26,10 @@ fun EstacionesMarkers(
                 title = "Nom_est: ${estacion.nomEst}",
                 snippet = "Ubicación: $direccion",
                 icon = icono,
-                onClick = { false }
+                onClick = {
+                    onEstacionClick?.invoke(estacion)
+                    false
+                }
             )
         }
     }

@@ -46,13 +46,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parotrash.modelos.LugarBusqueda
 import com.example.parotrash.modelos.RutaFavorita
+import com.example.parotrash.ui.componentes.BuscadorEstaciones
+import com.example.parotrash.ui.componentes.DialogoConfirmarEstacion
+import com.example.parotrash.ui.componentes.SelectorUbicacion
 import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.RutasFavoritasViewModel
 import com.example.parotrash.ui.viewmodel.RutasFavoritasViewModelFactory
 
 @Composable
 fun PantallaRutasFavoritas(
-    irAHome: () -> Unit
+    irAHome: () -> Unit,
+    irATransmilenio: () -> Unit,
+    irASITP: () -> Unit
 ) {
     val viewModel: RutasFavoritasViewModel = viewModel(
         factory = RutasFavoritasViewModelFactory(android.app.Application())

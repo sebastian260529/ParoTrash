@@ -1,10 +1,12 @@
 package com.example.parotrash.ui.viewmodel
 
 import android.app.Application
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parotrash.data.BusquedaLugaresRepository
+import com.example.parotrash.data.LocationManager
 import com.example.parotrash.data.RutasFavoritasRepository
 import com.example.parotrash.modelos.LugarBusqueda
 import com.example.parotrash.modelos.RutaFavorita
@@ -17,6 +19,7 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
 
     private val repository = RutasFavoritasRepository()
     private val busquedaRepository = BusquedaLugaresRepository()
+    private val locationManager = LocationManager(application)
     private val auth = FirebaseAuth.getInstance()
 
     private val _rutas = MutableStateFlow<List<RutaFavorita>>(emptyList())
@@ -30,6 +33,16 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
 
     private val _resultadoBusqueda = MutableStateFlow<List<LugarBusqueda>>(emptyList())
     val resultadoBusqueda: StateFlow<List<LugarBusqueda>> = _resultadoBusqueda
+
+    private val _seleccionTemporal = MutableStateFlow<LugarBusqueda?>(null)
+    val seleccionTemporal: StateFlow<LugarBusqueda?> = _seleccionTemporal
+
+    private val _ubicacionActual = MutableStateFlow<Location?>(null)
+    val ubicacionActual: StateFlow<Location?> = _ubicacionActual
+
+    enum class EstadoSelector { ESPERANDO, TRANSMILENIO, SITP, ALIMENTADOR }
+    private val _estadoSelector = MutableStateFlow(EstadoSelector.ESPERANDO)
+    val estadoSelector: StateFlow<EstadoSelector> = _estadoSelector
 
     init {
         cargarRutas()
@@ -131,5 +144,76 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
 
             _isLoading.value = false
         }
+    }
+
+    fun iniciarSelectorTransmilenio() {
+        _estadoSelector.value = EstadoSelector.TRANSMILENIO
+    }
+
+    fun iniciarSelectorSITP() {
+        _estadoSelector.value = EstadoSelector.SITP
+    }
+
+    fun iniciarSelectorAlimentador() {
+        _estadoSelector.value = EstadoSelector.ALIMENTADOR
+    }
+
+    fun obtenerMiUbicacion(onComplete: (LugarBusqueda?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val location = locationManager.getCurrentLocation()
+                    ?: locationManager.getLastKnownLocation()
+                _ubicacionActual.value = location
+
+                if (location != null) {
+                    val lugar = LugarBusqueda(
+                        nombre = "Mi ubicación",
+                        latitud = location.latitude,
+                        longitud = location.longitude,
+                        tipo = "ubicacion_actual",
+                        direccion = null
+                    )
+                    onComplete(lugar)
+                } else {
+                    _error.value = "No se pudo obtener ubicación"
+                    onComplete(null)
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al obtener ubicación: ${e.message}"
+                onComplete(null)
+            }
+        }
+    }
+
+    fun buscarEstaciones(texto: String) {
+        viewModelScope.launch {
+            try {
+                val resultados = busquedaRepository.buscarLugares(texto)
+                val soloEstaciones = resultados.filter { it.tipo == "estacion" }
+                _resultadoBusqueda.value = soloEstaciones.take(20)
+            } catch (e: Exception) {
+                _error.value = "Error en búsqueda: ${e.message}"
+            }
+        }
+    }
+
+    fun guardarSeleccionTemporal(lugar: LugarBusqueda) {
+        _seleccionTemporal.value = lugar
+    }
+
+    fun obtenerSeleccionTemporal(): LugarBusqueda? {
+        val seleccion = _seleccionTemporal.value
+        _seleccionTemporal.value = null
+        _estadoSelector.value = EstadoSelector.ESPERANDO
+        return seleccion
+    }
+
+    fun limpiarSeleccion() {
+        _seleccionTemporal.value = null
+        _estadoSelector.value = EstadoSelector.ESPERANDO
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 }

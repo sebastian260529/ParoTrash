@@ -12,7 +12,8 @@ import com.google.maps.android.compose.rememberMarkerState
 @Composable
 fun ParaderosMarkers(
     paraderos: List<ParaderoSITP>,
-    icono: BitmapDescriptor
+    icono: BitmapDescriptor,
+    onParaderoClick: ((ParaderoSITP) -> Unit)? = null
 ) {
     paraderos.forEach { paradero ->
         val pos = LatLng(paradero.latitud, paradero.longitud)
@@ -24,7 +25,10 @@ fun ParaderosMarkers(
                 title = "Nom_est: ${paradero.nombre}",
                 snippet = "Ubicación: $direccion",
                 icon = icono,
-                onClick = { false }
+                onClick = {
+                    onParaderoClick?.invoke(paradero)
+                    false
+                }
             )
         }
     }

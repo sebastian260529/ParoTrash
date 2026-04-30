@@ -45,7 +45,8 @@ private val BOGOTA = LatLng(4.6091, -74.0817)
 @Composable
 fun PantallaSITP(
     irAHome: () -> Unit,
-    irARutasFavoritas: () -> Unit
+    irARutasFavoritas: () -> Unit,
+    onParaderoSeleccionado: ((String, Double, Double) -> Unit)? = null
 ) {
     val context = LocalContext.current
 
@@ -77,7 +78,14 @@ fun PantallaSITP(
             if (iconoParadero != null) {
                 ParaderosMarkers(
                     paraderos = paraderos,
-                    icono = iconoParadero
+                    icono = iconoParadero,
+                    onParaderoClick = { paradero ->
+                        onParaderoSeleccionado?.invoke(
+                            paradero.nombre,
+                            paradero.latitud,
+                            paradero.longitud
+                        )
+                    }
                 )
             }
         }

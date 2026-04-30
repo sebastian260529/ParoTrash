@@ -44,7 +44,8 @@ private val BOGOTA = LatLng(4.6091, -74.0817)
 @Composable
 fun PantallaTransmilenio(
     irAHome: () -> Unit,
-    irARutasFavoritas: () -> Unit
+    irARutasFavoritas: () -> Unit,
+    onEstacionSeleccionada: ((String, Double, Double) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -77,7 +78,14 @@ fun PantallaTransmilenio(
             if (iconosEstaciones != null) {
                 EstacionesMarkers(
                     estaciones = estaciones,
-                    iconos = iconosEstaciones
+                    iconos = iconosEstaciones,
+                    onEstacionClick = { estacion ->
+                        onEstacionSeleccionada?.invoke(
+                            estacion.nomEst,
+                            estacion.latitud,
+                            estacion.longitud
+                        )
+                    }
                 )
             }
         }
