@@ -24,6 +24,35 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
     private val busquedaRepository = BusquedaLugaresRepository()
     private val locationManager = LocationManager(application)
     private val auth = FirebaseAuth.getInstance()
+    private val prefs = application.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+
+    companion object {
+        fun guardarSeleccionTemp(context: Context, nombre: String, lat: Double, lng: Double, tipo: String) {
+            context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+                .edit()
+                .putString("sel_nombre", nombre)
+                .putString("sel_lat", lat.toString())
+                .putString("sel_lng", lng.toString())
+                .putString("sel_tipo", tipo)
+                .apply()
+        }
+
+        fun obtenerSeleccionTemp(context: Context): LugarBusqueda? {
+            val prefs = context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+            val nombre = prefs.getString("sel_nombre", null) ?: return null
+            val lat = prefs.getString("sel_lat", "0.0")?.toDoubleOrNull() ?: 0.0
+            val lng = prefs.getString("sel_lng", "0.0")?.toDoubleOrNull() ?: 0.0
+            val tipo = prefs.getString("sel_tipo", "") ?: ""
+            return LugarBusqueda(nombre, lat, lng, tipo)
+        }
+
+        fun limpiarSeleccionTemp(context: Context) {
+            context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply()
+        }
+    }
 
     private val _rutas = MutableStateFlow<List<RutaFavorita>>(emptyList())
     val rutas: StateFlow<List<RutaFavorita>> = _rutas
@@ -289,11 +318,13 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
 
     fun guardarSeleccionTemporal(lugar: LugarBusqueda) {
         _seleccionTemporal.value = lugar
+        guardarSeleccionTemp(getApplication(), lugar.nombre, lugar.latitud, lugar.longitud, lugar.tipo)
     }
 
     fun obtenerSeleccionTemporal(): LugarBusqueda? {
-        val seleccion = _seleccionTemporal.value
+        val seleccion = _seleccionTemporal.value ?: obtenerSeleccionTemp(getApplication())
         _seleccionTemporal.value = null
+        limpiarSeleccionTemp(getApplication())
         _estadoSelector.value = EstadoSelector.ESPERANDO
         return seleccion
     }

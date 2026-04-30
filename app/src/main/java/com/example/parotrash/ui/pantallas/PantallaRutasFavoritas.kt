@@ -86,8 +86,18 @@ fun PantallaRutasFavoritas(
     var hastaTemporal by remember { mutableStateOf<LugarBusqueda?>(null) }
     var dialogoConfirmacion by remember { mutableStateOf<LugarBusqueda?>(null) }
     var esSeleccionDesde by remember { mutableStateOf(true) }
+    var mostrarSelectorDesdeHasta by remember { mutableStateOf(false) }
+    var lugarPendiente by remember { mutableStateOf<LugarBusqueda?>(null) }
 
     val seleccionTemporal by viewModel.seleccionTemporal.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        val lugar = viewModel.obtenerSeleccionTemporal()
+        if (lugar != null) {
+            lugarPendiente = lugar
+            mostrarSelectorDesdeHasta = true
+        }
+    }
 
     LaunchedEffect(error) {
         error?.let { msg ->

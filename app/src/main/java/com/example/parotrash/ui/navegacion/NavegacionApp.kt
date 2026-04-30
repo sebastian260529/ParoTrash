@@ -288,7 +288,9 @@ fun NavegacionApp(
                         tipo = "estacion"
                     )
                     rutasViewModel.guardarSeleccionTemporal(lugar)
-                    navController.popBackStack()
+                    navController.navigate(Pantallas.RutasFavoritas.ruta) {
+                        popUpTo(Pantallas.Home.ruta)
+                    }
                 }
             )
         }
@@ -305,7 +307,9 @@ fun NavegacionApp(
                         tipo = "paradero"
                     )
                     rutasViewModel.guardarSeleccionTemporal(lugar)
-                    navController.popBackStack()
+                    navController.navigate(Pantallas.RutasFavoritas.ruta) {
+                        popUpTo(Pantallas.Home.ruta)
+                    }
                 }
             )
         }
