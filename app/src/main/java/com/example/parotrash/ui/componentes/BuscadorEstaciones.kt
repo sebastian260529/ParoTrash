@@ -29,6 +29,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +52,9 @@ fun BuscadorEstaciones(
 ) {
     val resultados by viewModel.resultadoBusqueda.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    
+    // Estado local para el texto de búsqueda
+    var textoBusqueda by remember { mutableStateOf("") }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -93,9 +99,10 @@ fun BuscadorEstaciones(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { texto ->
-                        viewModel.buscarEstaciones(texto)
+                    value = textoBusqueda,
+                    onValueChange = { nuevoTexto ->
+                        textoBusqueda = nuevoTexto
+                        viewModel.buscarEstaciones(nuevoTexto)
                     },
                     placeholder = { Text("Escribe una estación...") },
                     leadingIcon = {
@@ -119,7 +126,7 @@ fun BuscadorEstaciones(
                     )
                 } else if (resultados.isEmpty()) {
                     Text(
-                        text = "Escribe para buscar estaciones",
+                        text = if (textoBusqueda.isEmpty()) "Escribe para buscar estaciones" else "No se encontraron estaciones",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.padding(vertical = 16.dp)
