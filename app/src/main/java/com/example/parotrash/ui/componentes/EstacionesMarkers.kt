@@ -28,7 +28,7 @@ fun EstacionesMarkers(
                 icon = icono,
                 onClick = {
                     onEstacionClick?.invoke(estacion)
-                    false
+                    true
                 }
             )
         }

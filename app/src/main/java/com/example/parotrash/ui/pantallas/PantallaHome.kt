@@ -233,7 +233,7 @@ fun PantallaHome(
                 onDismiss = { mostrarDialogoBusqueda = false },
                 onClickDesde = { /* TODO: Implementar acción */ },
                 onClickDestino = { /* TODO: Implementar acción */ },
-                onClickFavoritos = { /* TODO: Implementar acción */ },
+                onClickFavoritos = { irARutasFavoritas() },
                 onClickAnadirLugar = {
                     mostrarDialogoBusqueda = false
                     irARutasFavoritas()
