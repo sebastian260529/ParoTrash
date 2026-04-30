@@ -27,7 +27,7 @@ fun ParaderosMarkers(
                 icon = icono,
                 onClick = {
                     onParaderoClick?.invoke(paradero)
-                    false
+                    true
                 }
             )
         }

@@ -27,14 +27,53 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
     private val prefs = application.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
 
     companion object {
-        fun guardarSeleccionTemp(context: Context, nombre: String, lat: Double, lng: Double, tipo: String) {
+        fun guardarSeleccionTemp(context: Context, nombre: String, lat: Double, lng: Double, tipo: String, campo: String = "") {
             context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
                 .edit()
                 .putString("sel_nombre", nombre)
                 .putString("sel_lat", lat.toString())
                 .putString("sel_lng", lng.toString())
                 .putString("sel_tipo", tipo)
+                .putString("sel_campo", campo)
                 .apply()
+        }
+
+        fun guardarDesdeTemp(context: Context, nombre: String, lat: Double, lng: Double, tipo: String) {
+            context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+                .edit()
+                .putString("desde_nombre", nombre)
+                .putString("desde_lat", lat.toString())
+                .putString("desde_lng", lng.toString())
+                .putString("desde_tipo", tipo)
+                .apply()
+        }
+
+        fun guardarHastaTemp(context: Context, nombre: String, lat: Double, lng: Double, tipo: String) {
+            context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+                .edit()
+                .putString("hasta_nombre", nombre)
+                .putString("hasta_lat", lat.toString())
+                .putString("hasta_lng", lng.toString())
+                .putString("hasta_tipo", tipo)
+                .apply()
+        }
+
+        fun obtenerDesdeTemp(context: Context): LugarBusqueda? {
+            val prefs = context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+            val nombre = prefs.getString("desde_nombre", null) ?: return null
+            val lat = prefs.getString("desde_lat", "0.0")?.toDoubleOrNull() ?: 0.0
+            val lng = prefs.getString("desde_lng", "0.0")?.toDoubleOrNull() ?: 0.0
+            val tipo = prefs.getString("desde_tipo", "") ?: ""
+            return LugarBusqueda(nombre, lat, lng, tipo)
+        }
+
+        fun obtenerHastaTemp(context: Context): LugarBusqueda? {
+            val prefs = context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+            val nombre = prefs.getString("hasta_nombre", null) ?: return null
+            val lat = prefs.getString("hasta_lat", "0.0")?.toDoubleOrNull() ?: 0.0
+            val lng = prefs.getString("hasta_lng", "0.0")?.toDoubleOrNull() ?: 0.0
+            val tipo = prefs.getString("hasta_tipo", "") ?: ""
+            return LugarBusqueda(nombre, lat, lng, tipo)
         }
 
         fun obtenerSeleccionTemp(context: Context): LugarBusqueda? {
@@ -44,6 +83,11 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
             val lng = prefs.getString("sel_lng", "0.0")?.toDoubleOrNull() ?: 0.0
             val tipo = prefs.getString("sel_tipo", "") ?: ""
             return LugarBusqueda(nombre, lat, lng, tipo)
+        }
+
+        fun obtenerCampoActivoTemp(context: Context): String {
+            val prefs = context.getSharedPreferences("rutas_temp", Context.MODE_PRIVATE)
+            return prefs.getString("sel_campo", "") ?: ""
         }
 
         fun limpiarSeleccionTemp(context: Context) {
@@ -75,6 +119,26 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
     enum class EstadoSelector { ESPERANDO, TRANSMILENIO, SITP, ALIMENTADOR }
     private val _estadoSelector = MutableStateFlow(EstadoSelector.ESPERANDO)
     val estadoSelector: StateFlow<EstadoSelector> = _estadoSelector
+
+    private val _campoActivo = MutableStateFlow("")
+    val campoActivo: StateFlow<String> = _campoActivo
+
+    fun guardarCampoActivo(campo: String) {
+        _campoActivo.value = campo
+        prefs.edit().putString("campo_activo", campo).apply()
+    }
+
+    fun obtenerCampoActivo(): String {
+        val campo = _campoActivo.value.ifEmpty { 
+            prefs.getString("campo_activo", "") ?: ""
+        }
+        return campo
+    }
+
+    fun limpiarCampoActivo() {
+        _campoActivo.value = ""
+        prefs.edit().remove("campo_activo").apply()
+    }
 
     init {
         cargarRutas()
@@ -318,13 +382,18 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
 
     fun guardarSeleccionTemporal(lugar: LugarBusqueda) {
         _seleccionTemporal.value = lugar
-        guardarSeleccionTemp(getApplication(), lugar.nombre, lugar.latitud, lugar.longitud, lugar.tipo)
+        val campo = obtenerCampoActivo()
+        guardarSeleccionTemp(getApplication(), lugar.nombre, lugar.latitud, lugar.longitud, lugar.tipo, campo)
+        
+        when (campo) {
+            "desde" -> guardarDesdeTemp(getApplication(), lugar.nombre, lugar.latitud, lugar.longitud, lugar.tipo)
+            "destino" -> guardarHastaTemp(getApplication(), lugar.nombre, lugar.latitud, lugar.longitud, lugar.tipo)
+        }
     }
 
     fun obtenerSeleccionTemporal(): LugarBusqueda? {
         val seleccion = _seleccionTemporal.value ?: obtenerSeleccionTemp(getApplication())
         _seleccionTemporal.value = null
-        limpiarSeleccionTemp(getApplication())
         _estadoSelector.value = EstadoSelector.ESPERANDO
         return seleccion
     }
@@ -332,6 +401,23 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
     fun limpiarSeleccion() {
         _seleccionTemporal.value = null
         _estadoSelector.value = EstadoSelector.ESPERANDO
+        _campoActivo.value = ""
+    }
+
+    fun obtenerDesdeTemporal(): LugarBusqueda? {
+        return obtenerDesdeTemp(getApplication())
+    }
+
+    fun obtenerHastaTemporal(): LugarBusqueda? {
+        return obtenerHastaTemp(getApplication())
+    }
+
+    fun guardarDesdeTemporal(lugar: LugarBusqueda) {
+        guardarDesdeTemp(getApplication(), lugar.nombre, lugar.latitud, lugar.longitud, lugar.tipo)
+    }
+
+    fun guardarHastaTemporal(lugar: LugarBusqueda) {
+        guardarHastaTemp(getApplication(), lugar.nombre, lugar.latitud, lugar.longitud, lugar.tipo)
     }
 
     fun clearError() {

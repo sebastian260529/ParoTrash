@@ -77,6 +77,7 @@ fun PantallaRutasFavoritas(
     val rutas by viewModel.rutas.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
+    val campoActivoViewModel by viewModel.campoActivo.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -85,17 +86,34 @@ fun PantallaRutasFavoritas(
     var desdeTemporal by remember { mutableStateOf<LugarBusqueda?>(null) }
     var hastaTemporal by remember { mutableStateOf<LugarBusqueda?>(null) }
     var dialogoConfirmacion by remember { mutableStateOf<LugarBusqueda?>(null) }
-    var esSeleccionDesde by remember { mutableStateOf(true) }
-    var mostrarSelectorDesdeHasta by remember { mutableStateOf(false) }
-    var lugarPendiente by remember { mutableStateOf<LugarBusqueda?>(null) }
-
+    var primeraCarga by remember { mutableStateOf(true) }
     val seleccionTemporal by viewModel.seleccionTemporal.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        val lugar = viewModel.obtenerSeleccionTemporal()
-        if (lugar != null) {
-            lugarPendiente = lugar
-            mostrarSelectorDesdeHasta = true
+        if (primeraCarga) {
+            val desde = viewModel.obtenerDesdeTemporal()
+            val hasta = viewModel.obtenerHastaTemporal()
+            val lugar = viewModel.obtenerSeleccionTemporal()
+            val campo = viewModel.obtenerCampoActivo()
+
+            if (desde != null) {
+                desdeTemporal = desde
+            }
+            if (hasta != null) {
+                hastaTemporal = hasta
+            }
+            if (lugar != null) {
+                when (campo) {
+                    "desde" -> desdeTemporal = lugar
+                    "destino" -> hastaTemporal = lugar
+                    else -> desdeTemporal = lugar
+                }
+            }
+
+            if (desdeTemporal != null || hastaTemporal != null || lugar != null) {
+                mostrarDialogoAgregar = true
+            }
+            primeraCarga = false
         }
     }
 
@@ -109,7 +127,6 @@ fun PantallaRutasFavoritas(
     LaunchedEffect(seleccionTemporal) {
         seleccionTemporal?.let { lugar ->
             dialogoConfirmacion = lugar
-            viewModel.obtenerSeleccionTemporal()
         }
     }
 
@@ -257,14 +274,27 @@ fun PantallaRutasFavoritas(
         dialogoConfirmacion?.let { lugar ->
             DialogoConfirmarEstacion(
                 lugar = lugar,
-                onDismiss = { dialogoConfirmacion = null },
+                onDismiss = { 
+                    dialogoConfirmacion = null
+                    viewModel.obtenerSeleccionTemporal()
+                },
                 onConfirmar = {
-                    if (esSeleccionDesde) {
-                        desdeTemporal = lugar
-                    } else {
-                        hastaTemporal = lugar
+                    when (campoActivoViewModel) {
+                        "desde" -> {
+                            desdeTemporal = lugar
+                            viewModel.guardarDesdeTemporal(lugar)
+                        }
+                        "destino" -> {
+                            hastaTemporal = lugar
+                            viewModel.guardarHastaTemporal(lugar)
+                        }
+                        else -> {
+                            desdeTemporal = lugar
+                            viewModel.guardarDesdeTemporal(lugar)
+                        }
                     }
                     dialogoConfirmacion = null
+                    viewModel.obtenerSeleccionTemporal()
                 }
             )
         }
@@ -374,11 +404,11 @@ private fun DialogoAgregarRuta(
     onHastaSeleccionado: (LugarBusqueda) -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
-    var desde by remember(desdeInicial, hastaInicial) { mutableStateOf<LugarBusqueda?>(desdeInicial) }
-    var hasta by remember(desdeInicial, hastaInicial) { mutableStateOf<LugarBusqueda?>(hastaInicial) }
+    var desde by remember(desdeInicial) { mutableStateOf<LugarBusqueda?>(desdeInicial) }
+    var hasta by remember(hastaInicial) { mutableStateOf<LugarBusqueda?>(hastaInicial) }
 
     var mostrandoSelector by remember { mutableStateOf(false) }
-    var esSeleccionDesde by remember { mutableStateOf(true) }
+    var campoActivo by remember { mutableStateOf("") } // Cambiado: inicialmente vacío
     var mostrarBuscador by remember { mutableStateOf(false) }
     var mostrarConfirmacion by remember { mutableStateOf(false) }
     var lugarPorConfirmar by remember { mutableStateOf<LugarBusqueda?>(null) }
@@ -386,11 +416,23 @@ private fun DialogoAgregarRuta(
     val resultados by busquedaViewModel.resultadoBusqueda.collectAsStateWithLifecycle()
     val seleccionTemporal by busquedaViewModel.seleccionTemporal.collectAsStateWithLifecycle()
     val isLoading by busquedaViewModel.isLoading.collectAsStateWithLifecycle()
+    val campoActivoViewModel by busquedaViewModel.campoActivo.collectAsStateWithLifecycle()
 
-    val desdeState = desde
-    val hastaState = hasta
-    androidx.compose.runtime.LaunchedEffect(desdeState, hastaState) {
-        // Fuerza recomposición cuando cambian desde o hasta
+    LaunchedEffect(seleccionTemporal) {
+        seleccionTemporal?.let { lugar ->
+            val campo = campoActivoViewModel.ifEmpty { campoActivo }
+            when (campo) {
+                "desde" -> {
+                    desde = lugar
+                    onDesdeSeleccionado(lugar)
+                }
+                "destino" -> {
+                    hasta = lugar
+                    onHastaSeleccionado(lugar)
+                }
+            }
+            busquedaViewModel.limpiarCampoActivo()
+        }
     }
 
     androidx.compose.ui.window.Dialog(
@@ -439,8 +481,9 @@ private fun DialogoAgregarRuta(
                     texto = "Desde",
                     valorFirebase = desde?.nombre ?: "",
                     onClick = {
+                        campoActivo = "desde"
+                        busquedaViewModel.guardarCampoActivo("desde")
                         mostrandoSelector = true
-                        esSeleccionDesde = true
                     }
                 )
 
@@ -449,8 +492,9 @@ private fun DialogoAgregarRuta(
                     texto = "Destino",
                     valorFirebase = hasta?.nombre ?: "",
                     onClick = {
+                        campoActivo = "destino"
+                        busquedaViewModel.guardarCampoActivo("destino")
                         mostrandoSelector = true
-                        esSeleccionDesde = false
                     }
                 )
 
@@ -483,7 +527,11 @@ private fun DialogoAgregarRuta(
 
     if (mostrandoSelector) {
         SelectorUbicacion(
-            onDismiss = { mostrandoSelector = false },
+            onDismiss = {
+                mostrandoSelector = false
+                campoActivo = ""
+                busquedaViewModel.limpiarCampoActivo()
+            },
             onClickMiUbicacion = {
                 mostrandoSelector = false
                 busquedaViewModel.obtenerMiUbicacion { lugar ->
@@ -494,7 +542,20 @@ private fun DialogoAgregarRuta(
                             longitud = it.longitud,
                             tipo = "ubicacion_actual"
                         )
-                        if (esSeleccionDesde) desde = nuevoLugar else hasta = nuevoLugar
+                        when (campoActivo) {
+                            "desde" -> {
+                                desde = nuevoLugar
+                                onDesdeSeleccionado(nuevoLugar)
+                                busquedaViewModel.guardarDesdeTemporal(nuevoLugar)
+                            }
+                            "destino" -> {
+                                hasta = nuevoLugar
+                                onHastaSeleccionado(nuevoLugar)
+                                busquedaViewModel.guardarHastaTemporal(nuevoLugar)
+                            }
+                        }
+                        campoActivo = ""
+                        busquedaViewModel.limpiarCampoActivo()
                     }
                 }
             },
@@ -522,7 +583,11 @@ private fun DialogoAgregarRuta(
 
     if (mostrarBuscador) {
         BuscadorEstaciones(
-            onDismiss = { mostrarBuscador = false },
+            onDismiss = {
+                mostrarBuscador = false
+                campoActivo = ""
+                busquedaViewModel.limpiarCampoActivo()
+            },
             onSelectEstacion = { lugar ->
                 lugarPorConfirmar = lugar
                 mostrarBuscador = false
@@ -538,16 +603,27 @@ private fun DialogoAgregarRuta(
             onDismiss = {
                 mostrarConfirmacion = false
                 lugarPorConfirmar = null
+                busquedaViewModel.obtenerSeleccionTemporal()
             },
             onConfirmar = {
                 val lugarConfirmado = lugarPorConfirmar!!
-                if (esSeleccionDesde) {
-                    desde = lugarConfirmado
-                } else {
-                    hasta = lugarConfirmado
+                val campo = campoActivo.ifEmpty { campoActivoViewModel }
+                when (campo) {
+                    "desde" -> {
+                        desde = lugarConfirmado
+                        onDesdeSeleccionado(lugarConfirmado)
+                        busquedaViewModel.guardarDesdeTemporal(lugarConfirmado)
+                    }
+                    "destino" -> {
+                        hasta = lugarConfirmado
+                        onHastaSeleccionado(lugarConfirmado)
+                        busquedaViewModel.guardarHastaTemporal(lugarConfirmado)
+                    }
                 }
                 mostrarConfirmacion = false
                 lugarPorConfirmar = null
+                campoActivo = ""
+                busquedaViewModel.limpiarCampoActivo()
             }
         )
     }
