@@ -22,6 +22,9 @@ class SitpViewModel(application: Application) : AndroidViewModel(application) {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    private val _resultadosBusqueda = MutableStateFlow<List<ParaderoSITP>>(emptyList())
+    val resultadosBusqueda: StateFlow<List<ParaderoSITP>> = _resultadosBusqueda
+
     init {
         cargarParaderos()
     }
@@ -40,5 +43,17 @@ class SitpViewModel(application: Application) : AndroidViewModel(application) {
 
             _isLoading.value = false
         }
+    }
+
+    fun buscarParaderos(texto: String) {
+        if (texto.isBlank()) {
+            _resultadosBusqueda.value = emptyList()
+            return
+        }
+        val filtrados = _paraderos.value.filter {
+            it.nombre.contains(texto, ignoreCase = true) ||
+            it.direccion?.contains(texto, ignoreCase = true) == true
+        }
+        _resultadosBusqueda.value = filtrados.take(10)
     }
 }

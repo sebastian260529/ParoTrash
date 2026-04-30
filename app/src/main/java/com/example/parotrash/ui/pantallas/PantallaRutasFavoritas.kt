@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parotrash.modelos.LugarBusqueda
 import com.example.parotrash.modelos.RutaFavorita
+import com.example.parotrash.ui.componentes.BotonCargando
 import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.BuscadorEstaciones
 import com.example.parotrash.ui.componentes.Cabecera
@@ -363,8 +364,8 @@ private fun DialogoAgregarRuta(
     onHastaSeleccionado: (LugarBusqueda) -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
-    var desde by remember { mutableStateOf<LugarBusqueda?>(desdeInicial) }
-    var hasta by remember { mutableStateOf<LugarBusqueda?>(hastaInicial) }
+    var desde by remember(desdeInicial, hastaInicial) { mutableStateOf<LugarBusqueda?>(desdeInicial) }
+    var hasta by remember(desdeInicial, hastaInicial) { mutableStateOf<LugarBusqueda?>(hastaInicial) }
 
     var mostrandoSelector by remember { mutableStateOf(false) }
     var esSeleccionDesde by remember { mutableStateOf(true) }
@@ -374,6 +375,13 @@ private fun DialogoAgregarRuta(
 
     val resultados by busquedaViewModel.resultadoBusqueda.collectAsStateWithLifecycle()
     val seleccionTemporal by busquedaViewModel.seleccionTemporal.collectAsStateWithLifecycle()
+    val isLoading by busquedaViewModel.isLoading.collectAsStateWithLifecycle()
+
+    val desdeState = desde
+    val hastaState = hasta
+    androidx.compose.runtime.LaunchedEffect(desdeState, hastaState) {
+        // Fuerza recomposición cuando cambian desde o hasta
+    }
 
     androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismiss,
@@ -442,22 +450,22 @@ private fun DialogoAgregarRuta(
                 ) {
                     androidx.compose.material3.OutlinedButton(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Cancelar")
                     }
 
-                    androidx.compose.material3.Button(
+                    BotonCargando(
+                        nombre = "Guardar",
+                        isLoading = isLoading,
                         onClick = {
                             if (desde != null && hasta != null && nombre.isNotBlank()) {
                                 onGuardar(nombre, desde!!, hasta!!)
                             }
                         },
-                        enabled = desde != null && hasta != null && nombre.isNotBlank(),
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Guardar")
-                    }
+                    )
                 }
             }
         }
@@ -553,36 +561,49 @@ private fun DialogoEditarRuta(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(40.dp),
             colors = CardDefaults.cardColors(
                 containerColor = ParoTrashTheme.customColors.mapElementBackground
-            )
+            ),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
                     text = "Editar Ruta",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp,
+                        lineHeight = 24.sp
+                    ),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
-                androidx.compose.material3.OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                Formulario(
+                    icon1 = androidx.compose.material.icons.Icons.Default.Star,
+                    nombre = "Nombre",
+                    abajo = null,
+                    icon2 = false,
+                    usuario = nombre,
+                    onTextChange = { nombre = it }
                 )
 
                 Text(
                     text = "Desde: ${ruta.desdeNombre}",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Text(
                     text = "Hasta: ${ruta.hastaNombre}",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Row(
@@ -591,7 +612,8 @@ private fun DialogoEditarRuta(
                 ) {
                     androidx.compose.material3.OutlinedButton(
                         onClick = { mostrarConfirmacion = true },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Eliminar")
                     }
@@ -601,7 +623,8 @@ private fun DialogoEditarRuta(
                             onGuardar(ruta.copy(nombre = nombre))
                         },
                         enabled = nombre.isNotBlank(),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Guardar")
                     }

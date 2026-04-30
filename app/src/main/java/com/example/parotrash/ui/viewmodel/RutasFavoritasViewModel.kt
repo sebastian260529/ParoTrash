@@ -1,9 +1,12 @@
 package com.example.parotrash.ui.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.location.Location
+import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.example.parotrash.data.BusquedaLugaresRepository
 import com.example.parotrash.data.LocationManager
@@ -48,12 +51,18 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
         cargarRutas()
     }
 
-    fun cargarRutas() {
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            _error.value = "Debes iniciar sesión para ver tus rutas"
-            return
+    private fun getDeviceId(): String {
+        val prefs = application.getSharedPreferences("rutas_favoritas_prefs", Context.MODE_PRIVATE)
+        var deviceId = prefs.getString("device_id", null)
+        if (deviceId == null) {
+            deviceId = "device_${System.currentTimeMillis()}_${(0..99999).random()}"
+            prefs.edit().putString("device_id", deviceId).apply()
         }
+        return deviceId
+    }
+
+    fun cargarRutas() {
+        val uid = auth.currentUser?.uid ?: getDeviceId()
         
         viewModelScope.launch {
             _isLoading.value = true
@@ -63,6 +72,9 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
                 val resultado = repository.obtenerRutasPorUsuario(uid)
                 resultado.onSuccess { lista ->
                     _rutas.value = lista
+                    if (lista.isEmpty() && auth.currentUser == null) {
+                        repository.crearUsuarioSiNoExiste(uid)
+                    }
                 }.onFailure { e ->
                     _error.value = "Error al cargar rutas: ${e.message}"
                     Log.e("RutasVM", "Error cargar rutas: ${e.message}")
@@ -104,12 +116,7 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
         onSuccess: () -> Unit,
         onError: (String) -> Unit = {}
     ) {
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            _error.value = "Debes iniciar sesión"
-            onError("Debes iniciar sesión")
-            return
-        }
+        val uid = auth.currentUser?.uid ?: getDeviceId()
 
         if (nombre.isBlank()) {
             _error.value = "El nombre es obligatorio"

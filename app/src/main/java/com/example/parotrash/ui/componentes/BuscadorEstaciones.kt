@@ -58,7 +58,7 @@ fun BuscadorEstaciones(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(40.dp),
             colors = CardDefaults.cardColors(
                 containerColor = ParoTrashTheme.customColors.mapElementBackground
             ),
@@ -83,7 +83,8 @@ fun BuscadorEstaciones(
                         text = "Buscar estación",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold
-                        )
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.width(48.dp))

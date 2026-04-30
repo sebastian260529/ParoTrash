@@ -22,6 +22,9 @@ class EstacionesViewModel(application: Application) : AndroidViewModel(applicati
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    private val _resultadosBusqueda = MutableStateFlow<List<EstacionTransmilenio>>(emptyList())
+    val resultadosBusqueda: StateFlow<List<EstacionTransmilenio>> = _resultadosBusqueda
+
     init {
         cargarEstaciones()
     }
@@ -40,5 +43,17 @@ class EstacionesViewModel(application: Application) : AndroidViewModel(applicati
 
             _isLoading.value = false
         }
+    }
+
+    fun buscarEstaciones(texto: String) {
+        if (texto.isBlank()) {
+            _resultadosBusqueda.value = emptyList()
+            return
+        }
+        val filtradas = _estaciones.value.filter {
+            it.nomEst.contains(texto, ignoreCase = true) ||
+            it.ubEst?.contains(texto, ignoreCase = true) == true
+        }
+        _resultadosBusqueda.value = filtradas.take(10)
     }
 }

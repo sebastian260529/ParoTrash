@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.parotrash.ui.componentes.BotonSimple
 import com.example.parotrash.ui.theme.ParoTrashTheme
 
 @Composable
@@ -50,7 +51,7 @@ fun SelectorUbicacion(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(40.dp),
             colors = CardDefaults.cardColors(
                 containerColor = ParoTrashTheme.customColors.mapElementBackground
             ),
@@ -66,7 +67,8 @@ fun SelectorUbicacion(
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
-                    )
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -131,13 +133,10 @@ fun SelectorUbicacion(
                     )
                 }
 
-                OutlinedButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Cancelar")
-                }
+                BotonSimple(
+                    texto = "Cancelar",
+                    onClick = onDismiss
+                )
             }
         }
     }
@@ -168,7 +167,8 @@ private fun BotonOpcionSelector(
             Text(
                 text = texto,
                 style = MaterialTheme.typography.bodySmall,
-                fontSize = 10.sp
+                fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

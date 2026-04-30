@@ -34,7 +34,7 @@ class RutasFavoritasRepository {
             for (doc in snapshot.documents) {
                 try {
                     val ruta = doc.toObject(RutaFavorita::class.java)?.copy(id = doc.id)
-                    if (ruta != null && ruta.nombre.isNotBlank()) {
+                    if (ruta != null && ruta.nombre.isNotBlank() && ruta.nombre != "_usuario_nuevo_") {
                         rutas.add(ruta)
                     }
                 } catch (e: Exception) {
@@ -108,6 +108,38 @@ class RutasFavoritasRepository {
         } catch (e: Exception) {
             Log.e("RutasFavRepo", "Error eliminando ruta: ${e.message}")
             Result.failure(Exception("Error al eliminar: ${e.message}"))
+        }
+    }
+
+    suspend fun crearUsuarioSiNoExiste(uid: String): Result<Unit> {
+        return try {
+            val docs = firestore.collection(coleccion)
+                .whereEqualTo("id_usuario", uid)
+                .limit(1)
+                .get()
+                .await()
+
+            if (docs.isEmpty()) {
+                val docRef = firestore.collection(coleccion).document()
+                val rutaVacia = RutaFavorita(
+                    id = docRef.id,
+                    id_usuario = uid,
+                    nombre = "_usuario_nuevo_",
+                    desdeNombre = "",
+                    desdeLat = 0.0,
+                    desdeLng = 0.0,
+                    hastaNombre = "",
+                    hastaLat = 0.0,
+                    hastaLng = 0.0,
+                    fechaCreacion = System.currentTimeMillis()
+                )
+                docRef.set(rutaVacia).await()
+                Log.d("RutasFavRepo", "Usuario creado: $uid")
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("RutasFavRepo", "Error creando usuario: ${e.message}")
+            Result.failure(Exception("Error al crear usuario: ${e.message}"))
         }
     }
 }
