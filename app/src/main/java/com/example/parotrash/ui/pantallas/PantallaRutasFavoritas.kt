@@ -50,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parotrash.modelos.LugarBusqueda
 import com.example.parotrash.modelos.RutaFavorita
+import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.BuscadorEstaciones
 import com.example.parotrash.ui.componentes.DialogoConfirmarEstacion
 import com.example.parotrash.ui.componentes.SelectorUbicacion
@@ -212,12 +213,16 @@ fun PantallaRutasFavoritas(
                         desdeLng = desde.longitud,
                         hastaNombre = hasta.nombre,
                         hastaLat = hasta.latitud,
-                        hastaLng = hasta.longitud
-                    ) {
-                        mostrarDialogoAgregar = false
-                        desdeTemporal = null
-                        hastaTemporal = null
-                    }
+                        hastaLng = hasta.longitud,
+                        onSuccess = {
+                            mostrarDialogoAgregar = false
+                            desdeTemporal = null
+                            hastaTemporal = null
+                        },
+                        onError = { msg ->
+                            // El error ya se muestra en Snackbar via ViewModel
+                        }
+                    )
                 },
                 busquedaViewModel = viewModel,
                 irATransmilenio = irATransmilenio,
@@ -524,75 +529,6 @@ private fun DialogoAgregarRuta(
                 lugarPorConfirmar = null
             }
         )
-    }
-}
-                                    }
-                                    .padding(8.dp),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                }
-
-                androidx.compose.material3.OutlinedTextField(
-                    value = busquedaHasta,
-                    onValueChange = { 
-                        busquedaHasta = it
-                        busquedaViewModel.buscarLugares(it)
-                        mostrarHasta = true
-                    },
-                    label = { Text("Hasta") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-
-                if (mostrarHasta && resultados.isNotEmpty()) {
-                    LazyColumn(
-                        modifier = Modifier.height(120.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(resultados.take(5)) { lugar ->
-                            androidx.compose.material3.Text(
-                                text = "${lugar.nombre} (${lugar.tipo})",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        hasta = lugar
-                                        busquedaHasta = lugar.nombre
-                                        mostrarHasta = false
-                                    }
-                                    .padding(8.dp),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    androidx.compose.material3.OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Cancelar")
-                    }
-
-                    androidx.compose.material3.Button(
-                        onClick = {
-                            if (desde != null && hasta != null && nombre.isNotBlank()) {
-                                onGuardar(nombre, desde!!, hasta!!)
-                            }
-                        },
-                        enabled = desde != null && hasta != null && nombre.isNotBlank(),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Guardar")
-                    }
-                }
-            }
-        }
     }
 }
 
