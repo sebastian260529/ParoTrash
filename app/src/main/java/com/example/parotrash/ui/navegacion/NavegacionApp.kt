@@ -155,6 +155,7 @@ fun NavegacionApp(
                     }
                 },
                 irAConfiguracion = {navController.navigate(Pantallas.Configuracion.ruta)},
+                irARutasFavoritas = { navController.navigate(Pantallas.RutasFavoritas.ruta) },
                 sessionManager = sessionManager
             )
         }

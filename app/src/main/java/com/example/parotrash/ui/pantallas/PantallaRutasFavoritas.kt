@@ -1,6 +1,7 @@
 package com.example.parotrash.ui.pantallas
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +44,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,7 +55,9 @@ import com.example.parotrash.modelos.LugarBusqueda
 import com.example.parotrash.modelos.RutaFavorita
 import com.example.parotrash.ui.componentes.BotonInformacion
 import com.example.parotrash.ui.componentes.BuscadorEstaciones
+import com.example.parotrash.ui.componentes.Cabecera
 import com.example.parotrash.ui.componentes.DialogoConfirmarEstacion
+import com.example.parotrash.ui.componentes.Formulario
 import com.example.parotrash.ui.componentes.SelectorUbicacion
 import com.example.parotrash.ui.theme.ParoTrashTheme
 import com.example.parotrash.ui.viewmodel.RutasFavoritasViewModel
@@ -64,8 +69,9 @@ fun PantallaRutasFavoritas(
     irATransmilenio: () -> Unit,
     irASITP: () -> Unit
 ) {
+    val context = LocalContext.current
     val viewModel: RutasFavoritasViewModel = viewModel(
-        factory = RutasFavoritasViewModelFactory(android.app.Application())
+        factory = RutasFavoritasViewModelFactory(context.applicationContext as android.app.Application)
     )
     val rutas by viewModel.rutas.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -96,34 +102,20 @@ fun PantallaRutasFavoritas(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = irAHome) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Volver"
-                    )
-                }
-
-                Text(
-                    text = "Mis Rutas Favoritas",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                )
-
-                Spacer(modifier = Modifier.width(48.dp))
-            }
+            Cabecera(
+                texto = "Mis Rutas Favoritas",
+                onBackClick = irAHome
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -287,7 +279,7 @@ private fun TarjetaRutaFavorita(
         colors = CardDefaults.cardColors(
             containerColor = ParoTrashTheme.customColors.mapElementBackground
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -391,26 +383,37 @@ private fun DialogoAgregarRuta(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(40.dp),
             colors = CardDefaults.cardColors(
                 containerColor = ParoTrashTheme.customColors.mapElementBackground
-            )
+            ),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
                     text = "Nueva Ruta Favorita",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp,
+                        lineHeight = 24.sp
+                    ),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
-                androidx.compose.material3.OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre (ej: Casa - Trabajo)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                Formulario(
+                    icon1 = androidx.compose.material.icons.Icons.Default.Star,
+                    nombre = "Nombre (ej: Casa)",
+                    abajo = null,
+                    icon2 = false,
+                    usuario = nombre,
+                    onTextChange = { nombre = it }
                 )
 
                 BotonInformacion(

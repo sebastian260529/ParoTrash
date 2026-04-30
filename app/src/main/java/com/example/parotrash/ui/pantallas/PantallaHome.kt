@@ -53,6 +53,7 @@ fun PantallaHome(
     alertasViewModel: AlertasViewModel,
     irACerrarSesion: () -> Unit,
     irAConfiguracion: () -> Unit,
+    irARutasFavoritas: () -> Unit,
     sessionManager: SessionManager
 ) {
     val context = LocalContext.current
@@ -233,7 +234,10 @@ fun PantallaHome(
                 onClickDesde = { /* TODO: Implementar acción */ },
                 onClickDestino = { /* TODO: Implementar acción */ },
                 onClickFavoritos = { /* TODO: Implementar acción */ },
-                onClickAnadirLugar = { /* TODO: Implementar acción */ },
+                onClickAnadirLugar = {
+                    mostrarDialogoBusqueda = false
+                    irARutasFavoritas()
+                },
                 onClickComenzarViaje = { /* TODO: Implementar acción */ }
             )
         }
