@@ -32,6 +32,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,9 +68,32 @@ fun PantallaRutasFavoritas(
     )
     val rutas by viewModel.rutas.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var mostrarDialogoAgregar by remember { mutableStateOf(false) }
     var rutaAEditar by remember { mutableStateOf<RutaFavorita?>(null) }
+    var desdeTemporal by remember { mutableStateOf<LugarBusqueda?>(null) }
+    var hastaTemporal by remember { mutableStateOf<LugarBusqueda?>(null) }
+    var dialogoConfirmacion by remember { mutableStateOf<LugarBusqueda?>(null) }
+    var esSeleccionDesde by remember { mutableStateOf(true) }
+
+    val seleccionTemporal by viewModel.seleccionTemporal.collectAsStateWithLifecycle()
+
+    LaunchedEffect(error) {
+        error?.let { msg ->
+            snackbarHostState.showSnackbar(msg)
+            viewModel.clearError()
+        }
+    }
+
+    LaunchedEffect(seleccionTemporal) {
+        seleccionTemporal?.let { lugar ->
+            dialogoConfirmacion = lugar
+            viewModel.obtenerSeleccionTemporal()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -188,9 +215,17 @@ fun PantallaRutasFavoritas(
                         hastaLng = hasta.longitud
                     ) {
                         mostrarDialogoAgregar = false
+                        desdeTemporal = null
+                        hastaTemporal = null
                     }
                 },
-                busquedaViewModel = viewModel
+                busquedaViewModel = viewModel,
+                irATransmilenio = irATransmilenio,
+                irASITP = irASITP,
+                desdeInicial = desdeTemporal,
+                hastaInicial = hastaTemporal,
+                onDesdeSeleccionado = { lugar -> desdeTemporal = lugar },
+                onHastaSeleccionado = { lugar -> hastaTemporal = lugar }
             )
         }
 
@@ -210,6 +245,26 @@ fun PantallaRutasFavoritas(
                 }
             )
         }
+
+        dialogoConfirmacion?.let { lugar ->
+            DialogoConfirmarEstacion(
+                lugar = lugar,
+                onDismiss = { dialogoConfirmacion = null },
+                onConfirmar = {
+                    if (esSeleccionDesde) {
+                        desdeTemporal = lugar
+                    } else {
+                        hastaTemporal = lugar
+                    }
+                    dialogoConfirmacion = null
+                }
+            )
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 
@@ -302,19 +357,26 @@ private fun TarjetaRutaFavorita(
 private fun DialogoAgregarRuta(
     onDismiss: () -> Unit,
     onGuardar: (String, LugarBusqueda, LugarBusqueda) -> Unit,
-    busquedaViewModel: RutasFavoritasViewModel
+    busquedaViewModel: RutasFavoritasViewModel,
+    irATransmilenio: () -> Unit,
+    irASITP: () -> Unit,
+    desdeInicial: LugarBusqueda?,
+    hastaInicial: LugarBusqueda?,
+    onDesdeSeleccionado: (LugarBusqueda) -> Unit,
+    onHastaSeleccionado: (LugarBusqueda) -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
-    var desde by remember { mutableStateOf<LugarBusqueda?>(null) }
-    var hasta by remember { mutableStateOf<LugarBusqueda?>(null) }
-    var busquedaDesde by remember { mutableStateOf("") }
-    var busquedaHasta by remember { mutableStateOf("") }
-    var resultadosDesde by remember { mutableStateOf<List<LugarBusqueda>>(emptyList()) }
-    var resultadosHasta by remember { mutableStateOf<List<LugarBusqueda>>(emptyList()) }
-    var mostrarDesde by remember { mutableStateOf(false) }
-    var mostrarHasta by remember { mutableStateOf(false) }
+    var desde by remember { mutableStateOf<LugarBusqueda?>(desdeInicial) }
+    var hasta by remember { mutableStateOf<LugarBusqueda?>(hastaInicial) }
+
+    var mostrandoSelector by remember { mutableStateOf(false) }
+    var esSeleccionDesde by remember { mutableStateOf(true) }
+    var mostrarBuscador by remember { mutableStateOf(false) }
+    var mostrarConfirmacion by remember { mutableStateOf(false) }
+    var lugarPorConfirmar by remember { mutableStateOf<LugarBusqueda?>(null) }
 
     val resultados by busquedaViewModel.resultadoBusqueda.collectAsStateWithLifecycle()
+    val seleccionTemporal by busquedaViewModel.seleccionTemporal.collectAsStateWithLifecycle()
 
     androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismiss,
@@ -346,32 +408,124 @@ private fun DialogoAgregarRuta(
                     singleLine = true
                 )
 
-                androidx.compose.material3.OutlinedTextField(
-                    value = busquedaDesde,
-                    onValueChange = { 
-                        busquedaDesde = it
-                        busquedaViewModel.buscarLugares(it)
-                        mostrarDesde = true
-                    },
-                    label = { Text("Desde") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                BotonInformacion(
+                    icon1 = androidx.compose.material.icons.Icons.Default.Place,
+                    texto = "Desde",
+                    valorFirebase = desde?.nombre ?: "",
+                    onClick = {
+                        mostrandoSelector = true
+                        esSeleccionDesde = true
+                    }
                 )
 
-                if (mostrarDesde && resultados.isNotEmpty()) {
-                    LazyColumn(
-                        modifier = Modifier.height(120.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                BotonInformacion(
+                    icon1 = androidx.compose.material.icons.Icons.Default.Place,
+                    texto = "Destino",
+                    valorFirebase = hasta?.nombre ?: "",
+                    onClick = {
+                        mostrandoSelector = true
+                        esSeleccionDesde = false
+                    }
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f)
                     ) {
-                        items(resultados.take(5)) { lugar ->
-                            androidx.compose.material3.Text(
-                                text = "${lugar.nombre} (${lugar.tipo})",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        desde = lugar
-                                        busquedaDesde = lugar.nombre
-                                        mostrarDesde = false
+                        Text("Cancelar")
+                    }
+
+                    androidx.compose.material3.Button(
+                        onClick = {
+                            if (desde != null && hasta != null && nombre.isNotBlank()) {
+                                onGuardar(nombre, desde!!, hasta!!)
+                            }
+                        },
+                        enabled = desde != null && hasta != null && nombre.isNotBlank(),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Guardar")
+                    }
+                }
+            }
+        }
+    }
+
+    if (mostrandoSelector) {
+        SelectorUbicacion(
+            onDismiss = { mostrandoSelector = false },
+            onClickMiUbicacion = {
+                mostrandoSelector = false
+                busquedaViewModel.obtenerMiUbicacion { lugar ->
+                    lugar?.let {
+                        val nuevoLugar = LugarBusqueda(
+                            nombre = "Mi ubicación",
+                            latitud = it.latitud,
+                            longitud = it.longitud,
+                            tipo = "ubicacion_actual"
+                        )
+                        if (esSeleccionDesde) desde = nuevoLugar else hasta = nuevoLugar
+                    }
+                }
+            },
+            onClickTransmilenio = {
+                mostrandoSelector = false
+                busquedaViewModel.iniciarSelectorTransmilenio()
+                irATransmilenio()
+            },
+            onClickSITP = {
+                mostrandoSelector = false
+                busquedaViewModel.iniciarSelectorSITP()
+                irASITP()
+            },
+            onClickAlimentador = {
+                mostrandoSelector = false
+                busquedaViewModel.iniciarSelectorAlimentador()
+                irASITP()
+            },
+            onClickBuscarEstacion = {
+                mostrandoSelector = false
+                mostrarBuscador = true
+            }
+        )
+    }
+
+    if (mostrarBuscador) {
+        BuscadorEstaciones(
+            onDismiss = { mostrarBuscador = false },
+            onSelectEstacion = { lugar ->
+                lugarPorConfirmar = lugar
+                mostrarBuscador = false
+                mostrarConfirmacion = true
+            },
+            viewModel = busquedaViewModel
+        )
+    }
+
+    if (mostrarConfirmacion && lugarPorConfirmar != null) {
+        DialogoConfirmarEstacion(
+            lugar = lugarPorConfirmar!!,
+            onDismiss = {
+                mostrarConfirmacion = false
+                lugarPorConfirmar = null
+            },
+            onConfirmar = {
+                val lugarConfirmado = lugarPorConfirmar!!
+                if (esSeleccionDesde) {
+                    desde = lugarConfirmado
+                } else {
+                    hasta = lugarConfirmado
+                }
+                mostrarConfirmacion = false
+                lugarPorConfirmar = null
+            }
+        )
+    }
+}
                                     }
                                     .padding(8.dp),
                                 style = MaterialTheme.typography.bodyMedium

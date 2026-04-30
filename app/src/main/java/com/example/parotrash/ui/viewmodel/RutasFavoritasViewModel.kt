@@ -49,27 +49,47 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun cargarRutas() {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            _error.value = "Debes iniciar sesión para ver tus rutas"
+            return
+        }
+        
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
 
-            val resultado = repository.obtenerRutasPorUsuario(uid)
-            resultado.onSuccess { lista ->
-                _rutas.value = lista
-            }.onFailure { e ->
-                _error.value = e.message
-                Log.e("RutasVM", "Error: ${e.message}")
+            try {
+                val resultado = repository.obtenerRutasPorUsuario(uid)
+                resultado.onSuccess { lista ->
+                    _rutas.value = lista
+                }.onFailure { e ->
+                    _error.value = "Error al cargar rutas: ${e.message}"
+                    Log.e("RutasVM", "Error cargar rutas: ${e.message}")
+                }
+            } catch (e: Exception) {
+                _error.value = "Error de conexión: ${e.message}"
+                Log.e("RutasVM", "Exception: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
-
-            _isLoading.value = false
         }
     }
 
     fun buscarLugares(texto: String) {
+        if (texto.isBlank()) {
+            _resultadoBusqueda.value = emptyList()
+            return
+        }
+        
         viewModelScope.launch {
-            val resultados = busquedaRepository.buscarLugares(texto)
-            _resultadoBusqueda.value = resultados
+            try {
+                val resultados = busquedaRepository.buscarLugares(texto)
+                _resultadoBusqueda.value = resultados
+            } catch (e: Exception) {
+                _error.value = "Error en búsqueda: ${e.message}"
+                Log.e("RutasVM", "Error búsqueda: ${e.message}")
+            }
         }
     }
 
@@ -81,68 +101,109 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
         hastaNombre: String,
         hastaLat: Double,
         hastaLng: Double,
-        onSuccess: () -> Unit
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit = {}
     ) {
-        val uid = auth.currentUser?.uid ?: run {
-            _error.value = "Usuario no autenticado"
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            _error.value = "Debes iniciar sesión"
+            onError("Debes iniciar sesión")
+            return
+        }
+
+        if (nombre.isBlank()) {
+            _error.value = "El nombre es obligatorio"
+            onError("El nombre es obligatorio")
+            return
+        }
+
+        if (desdeLat == 0.0 || hastaLat == 0.0) {
+            _error.value = "SeleccionaDesde y Destino"
+            onError("Selecciona Desde y Destino")
             return
         }
 
         viewModelScope.launch {
             _isLoading.value = true
+            _error.value = null
 
-            val ruta = RutaFavorita(
-                id_usuario = uid,
-                nombre = nombre,
-                desdeNombre = desdeNombre,
-                desdeLat = desdeLat,
-                desdeLng = desdeLng,
-                hastaNombre = hastaNombre,
-                hastaLat = hastaLat,
-                hastaLng = hastaLng
-            )
+            try {
+                val ruta = RutaFavorita(
+                    id_usuario = uid,
+                    nombre = nombre.trim(),
+                    desdeNombre = desdeNombre.trim(),
+                    desdeLat = desdeLat,
+                    desdeLng = desdeLng,
+                    hastaNombre = hastaNombre.trim(),
+                    hastaLat = hastaLat,
+                    hastaLng = hastaLng
+                )
 
-            val resultado = repository.guardarRuta(ruta)
-            resultado.onSuccess {
-                cargarRutas()
-                onSuccess()
-            }.onFailure { e ->
-                _error.value = e.message
+                val resultado = repository.guardarRuta(ruta)
+                resultado.onSuccess {
+                    cargarRutas()
+                    onSuccess()
+                }.onFailure { e ->
+                    val msg = "Error al guardar: ${e.message}"
+                    _error.value = msg
+                    onError(msg)
+                    Log.e("RutasVM", msg)
+                }
+            } catch (e: Exception) {
+                val msg = "Error de conexión: ${e.message}"
+                _error.value = msg
+                onError(msg)
+                Log.e("RutasVM", msg)
+            } finally {
+                _isLoading.value = false
             }
-
-            _isLoading.value = false
         }
     }
 
     fun actualizarRuta(ruta: RutaFavorita, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
+            _error.value = null
 
-            val resultado = repository.actualizarRuta(ruta)
-            resultado.onSuccess {
-                cargarRutas()
-                onSuccess()
-            }.onFailure { e ->
-                _error.value = e.message
+            try {
+                val resultado = repository.actualizarRuta(ruta)
+                resultado.onSuccess {
+                    cargarRutas()
+                    onSuccess()
+                }.onFailure { e ->
+                    _error.value = "Error al actualizar: ${e.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Error: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
-
-            _isLoading.value = false
         }
     }
 
     fun eliminarRuta(id: String, onSuccess: () -> Unit) {
+        if (id.isBlank()) {
+            _error.value = "ID de ruta inválido"
+            return
+        }
+        
         viewModelScope.launch {
             _isLoading.value = true
+            _error.value = null
 
-            val resultado = repository.eliminarRuta(id)
-            resultado.onSuccess {
-                cargarRutas()
-                onSuccess()
-            }.onFailure { e ->
-                _error.value = e.message
+            try {
+                val resultado = repository.eliminarRuta(id)
+                resultado.onSuccess {
+                    cargarRutas()
+                    onSuccess()
+                }.onFailure { e ->
+                    _error.value = "Error al eliminar: ${e.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Error: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
-
-            _isLoading.value = false
         }
     }
 
@@ -161,6 +222,12 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
     fun obtenerMiUbicacion(onComplete: (LugarBusqueda?) -> Unit) {
         viewModelScope.launch {
             try {
+                if (!locationManager.hasLocationPermission()) {
+                    _error.value = "Permiso de ubicación denegado"
+                    onComplete(null)
+                    return@launch
+                }
+                
                 val location = locationManager.getCurrentLocation()
                     ?: locationManager.getLastKnownLocation()
                 _ubicacionActual.value = location
@@ -175,24 +242,40 @@ class RutasFavoritasViewModel(application: Application) : AndroidViewModel(appli
                     )
                     onComplete(lugar)
                 } else {
-                    _error.value = "No se pudo obtener ubicación"
+                    _error.value = "No se pudo obtener ubicación. Verifica que el GPS esté activado."
                     onComplete(null)
                 }
+            } catch (e: SecurityException) {
+                _error.value = "Permiso de ubicación requerido"
+                Log.e("RutasVM", "Security: ${e.message}")
+                onComplete(null)
             } catch (e: Exception) {
                 _error.value = "Error al obtener ubicación: ${e.message}"
+                Log.e("RutasVM", "Ubicación error: ${e.message}")
                 onComplete(null)
             }
         }
     }
 
     fun buscarEstaciones(texto: String) {
+        if (texto.isBlank()) {
+            _resultadoBusqueda.value = emptyList()
+            return
+        }
+        
         viewModelScope.launch {
+            _error.value = null
             try {
                 val resultados = busquedaRepository.buscarLugares(texto)
                 val soloEstaciones = resultados.filter { it.tipo == "estacion" }
                 _resultadoBusqueda.value = soloEstaciones.take(20)
+                
+                if (soloEstaciones.isEmpty()) {
+                    Log.d("RutasVM", "No se encontraron estaciones para: $texto")
+                }
             } catch (e: Exception) {
                 _error.value = "Error en búsqueda: ${e.message}"
+                Log.e("RutasVM", "Error búsqueda: ${e.message}")
             }
         }
     }
